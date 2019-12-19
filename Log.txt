@@ -1,0 +1,45 @@
+December 1st - Created mockup wireframes of what the application will look like/how it navigates
+
+
+December 10th - Wrote out a step by step plan on how to achieve a working prototype
+
+  Write Simple optimization algorithm MPT (uses 4 set tickers)
+
+  Set up flask server with basic page (with a submit button called generate portfolio)
+
+  Add javascript ajax post request
+
+  Add server logic for processing this post request
+
+  Link optimization algoritm call function to the post request
+
+  Add input form on html page for stock ticker input and modify optimization function to take these tickers as parameters
+  and use them as input.
+
+  Add redirect of generate portfolio to go to a portfolio summary 
+  
+  Get servers calculated sharpe ratio from optimzation and return it to the client so it shows up on the page
+  
+  
+ 
+  Alter optimization code so that it can return the weights of the optimimum portfolio
+  
+  Use weights to build a pie chart
+  
+  Return pie chart to client so it displays on page
+  
+  Change html css to provide a portfolio summary template (Show all this info in a structured way)
+  
+  
+  PREDICTED ERROR VALIDATION
+  Return error if the input is not a valid ticker
+  
+  Quality of life tasks
+  Generating portfolio takes a while - Will probably need some sort of loading screen/icon
+  
+  
+  
+  
+
+
+
