@@ -20,21 +20,26 @@
               
                 </ul>
             </nav>
-            <h3 class="text-muted">Portfolio Optimization Appzz</h3>
+            <h3 class="text-muted">Portfolio Optimization App</h3>
         </div>
  
         <div class="jumbotron">
             <h1></h1>
             <p class="lead"></p>
-			<form class="form-signin">
-			<label for="inputName" class="sr-only">Name</label>
-			<input type="name" name="inputName" id="inputName" class="form-control" placeholder="Stock Ticker 1" required autofocus>
-			<label for="inputEmail" class="sr-only">Email address</label>
-			<input type="email" name="inputEmail" id="inputEmail" class="form-control" placeholder="Stock Ticker 2" required autofocus>
-			<label for="inputPassword" class="sr-only">Password</label>
-			<input type="password" name="inputPassword" id="inputPassword" class="form-control" placeholder="Stock Ticker 3" required>
-            <p><a id="generatePortfolioBtn" class="btn btn-lg btn-success" role="button">Generate Portfolio</a>
-            </p>
+			
+		<form class="form-signin" action="/generatePortfolio" method="post">
+			<label for="inputTicker1" class="sr-only">Name</label>
+			<input type="name" name="inputTicker1" id="inputTicker1" class="form-control" placeholder="Stock Ticker 1" required autofocus>
+			<label for="inputTicker2" class="sr-only">Email address</label>
+			<input type="name" name="inputTicker2" id="inputTicker2" class="form-control" placeholder="Stock Ticker 2" required autofocus>
+			<label for="inputTicker3" class="sr-only">Password</label>
+			<input type="name" name="inputTicker3" id="inputTicker3" class="form-control" placeholder="Stock Ticker 3" required>
+			<button id="generatePortfolioBtn" class="btn btn-lg btn-primary btn-block" type="submit">Generate Portfolio</button>
+		</form>
+			
+			
+			
+            
         </div>
  
         <div class="row marketing">
