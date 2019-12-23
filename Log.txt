@@ -20,7 +20,7 @@ December 10th - Wrote out a step by step plan on how to achieve a working protot
   
   Get servers calculated sharpe ratio from optimzation and return it to the client so it shows up on the page
   
-  
+ 
  
   Alter optimization code so that it can return the weights of the optimimum portfolio
   
@@ -40,6 +40,25 @@ December 10th - Wrote out a step by step plan on how to achieve a working protot
   
   
   
+
+
+23rd December
+
+Managed to get a template image on server returned to the clients html page. This can be used for a matplotlib graph
+
+Looking at PDF return mechanisms specifically file pathing and came across idea that server should be hosted on apache not a local host?
+Need to ask David about this. Functionally speaking as a widely used app yes this would be needed.
+
+
+
+
+
+
+
+
+
+
+
 
 
 
