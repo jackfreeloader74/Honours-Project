@@ -49,6 +49,10 @@ Managed to get a template image on server returned to the clients html page. Thi
 Looking at PDF return mechanisms specifically file pathing and came across idea that server should be hosted on apache not a local host?
 Need to ask David about this. Functionally speaking as a widely used app yes this would be needed.
 
+Validate Tickers,
+Add tickers as input to optimization (will probably needed to be sorted alphabetically)
+Add expected return to front end post request
+Change optimization to find based on that risk
 
 
 
