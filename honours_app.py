@@ -1,8 +1,12 @@
 from flask import Flask, render_template, redirect, request, json, send_file, current_app as app, send_from_directory
 import HonoursProjectStart as hp
 import flask
+import pdfkit
+
 
 app = Flask(__name__, static_folder='static')
+config = pdfkit.configuration(wkhtmltopdf='C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe')
+
 
 @app.route("/")
 def main():
@@ -17,31 +21,35 @@ def ShowPortfolio():
 
 @app.route('/generatePortfolio', methods=['POST'])
 def generatePortfolio():
+
+    # Obtain tickers from user input
     _ticker1 = request.form['inputTicker1']
     _ticker2 = request.form['inputTicker2']
     _ticker3 = request.form['inputTicker3']
     
-    print("Tickers ", _ticker1, _ticker2, _ticker3)
-    #Sharpe = hp.OptimizePortfolio(_ticker1, _ticker2, _ticker3 )
-    print("The sharp ratio is ")
-    print("Render Template")
-    var1 = "test str"
-    return render_template('portfolio_summary.html', name = 'Portfolio Weights', url ='/static/images/img.jpg')
-    #return redirect('/ShowPortfolio')
-
-
+   
+    Sharpe = hp.OptimizePortfolio(_ticker1, _ticker2, _ticker3 )
+    
+    
+    return render_template('portfolio_summary.html', name = 'Portfolio Weights', url ='static/images/pie_chart.png')
+   
 
 @app.route('/generatePDF', methods=['POST'])
 def generatePDF():
-    #return send_from_directory(app.config['/static/images'], 'stuff.pdf')
-    return flask.redirect(flask.url_for('static', filename='images/' + 'stuff.pdf'), code=301)
-
+    pdfkit.from_file('templates/portfolio_summary.html', 'static/images/portfolio.pdf',configuration=config)
+    return flask.redirect(flask.url_for('static', filename='images/' + 'portfolio.pdf'), code=301)
+    
     
     
 
 
 if __name__ == "__main__":
     app.run(debug=True)
+
+
+
+
+
 
 
 

@@ -7,13 +7,17 @@ import matplotlib.pyplot as plt
 
 
 
-def OptimizePortfolio():
-    stocks = [ 'AAPL','AMZN', 'MSFT', 'TSLA' ]
+def OptimizePortfolio(stock1, stock2, stock3):
+
+    #stocks = [ 'AAPL','AMZN', 'MSFT', 'TSLA' ]
+
+    print(stock1, stock2, stock3)
+    stocks = [ 'AMZN', stock1, stock2, stock3]
 
     data = web.DataReader( stocks, data_source="yahoo", start='01/01/2015', end='01/01/2018')['Adj Close']
     data.sort_index(inplace=True)
 
-    num_portfolios = 250000
+    num_portfolios = 250
 
 
     # convert daily stock prices into daily returns
@@ -57,29 +61,43 @@ def OptimizePortfolio():
 
         if( results[2,i] > currentSharpe ):
             currentSharpe = results[2,i]
-        
-        
-        
+            
+            # Save weights #
+            BestWeights = weights
 
-    print(results.T)
-    return currentSharpe
 
+    # Record and plot results
     results_frame = pd.DataFrame(results.T, columns=['ret', 'stdev', 'sharpe'] )
 
-
-   # plt.scatter(results_frame.stdev, results_frame.ret, c=results_frame.sharpe, cmap='RdYlBu')
-
+    #plt.scatter(results_frame.stdev, results_frame.ret, c=results_frame.sharpe, cmap='RdYlBu')
     #plt.colorbar()
-
     #plt.show()
-    print("End")
+    ## PieChart
+
+    #labels = 'AAPL', 'AMZN', 'MSFT', 'TSLA'
+    labels = 'AMZN', stock1, stock2, stock3
+   
+    fig1, ax1 = plt.subplots()
+    colors = ['yellowgreen', 'gold', 'lightskyblue', 'lightcoral']
+    patches, texts = plt.pie(BestWeights, colors=colors, startangle=90)
+   
+    plt.legend(patches, labels, loc="best")
+    ax1.axis('equal')
+    plt.tight_layout()
+
+    plt.savefig('static/images/pie_chart.png', bbox_inches='tight')
+
+    return currentSharpe
 
 
 
 
 
-# set array holding portfolio weights of each stock
-weights = np.asarray([0.5, 0.2, 0.2, 0.1])
+
+
+
+
+
 
 
 
