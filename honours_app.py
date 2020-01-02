@@ -16,9 +16,8 @@ def main():
 @app.route('/ShowPortfolio')
 def ShowPortfolio():
     print("Showing")
-    return render_template('portfolio_summary.html')
-
-
+    return render_template('portfolio_summary.html', name = 'Portfolio Weights', url ='static/images/pie_chart.png')
+    
 @app.route('/generatePortfolio', methods=['POST'])
 def generatePortfolio():
 
@@ -28,20 +27,16 @@ def generatePortfolio():
     _ticker3 = request.form['inputTicker3']
     
    
-    Sharpe = hp.OptimizePortfolio(_ticker1, _ticker2, _ticker3 )
+    #Sharpe = hp.OptimizePortfolio(_ticker1, _ticker2, _ticker3 )
     
-    
-    return render_template('portfolio_summary.html', name = 'Portfolio Weights', url ='static/images/pie_chart.png')
-   
+    return redirect('/ShowPortfolio')
+  
 
 @app.route('/generatePDF', methods=['POST'])
 def generatePDF():
     pdfkit.from_file('templates/portfolio_summary.html', 'static/images/portfolio.pdf',configuration=config)
     return flask.redirect(flask.url_for('static', filename='images/' + 'portfolio.pdf'), code=301)
     
-    
-    
-
 
 if __name__ == "__main__":
     app.run(debug=True)
