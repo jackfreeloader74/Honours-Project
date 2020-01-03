@@ -5,14 +5,12 @@ import datetime as dt
 import matplotlib.pyplot as plt
 
 
-
-
-def OptimizePortfolio(stock1, stock2, stock3):
+def OptimizePortfolio(stock1, stock2, stock3, user_expected_return):
 
     #stocks = [ 'AAPL','AMZN', 'MSFT', 'TSLA' ]
 
     print(stock1, stock2, stock3)
-    stocks = [ 'AMZN', stock1, stock2, stock3]
+    stocks = [ 'AAPL', stock1, stock2, stock3]
 
     data = web.DataReader( stocks, data_source="yahoo", start='01/01/2015', end='01/01/2018')['Adj Close']
     data.sort_index(inplace=True)
@@ -32,7 +30,9 @@ def OptimizePortfolio(stock1, stock2, stock3):
 
     results = np.zeros((3, num_portfolios))
     currentSharpe = -4000
-
+    lowest_current_risk = -4000
+    BestReturn = 0
+    
     print("Starting optimization...")
 
     for i in range(num_portfolios):
@@ -66,15 +66,19 @@ def OptimizePortfolio(stock1, stock2, stock3):
             BestWeights = weights
 
 
+        ## Find the portfolio with the expected return that matches the specified one
+            ## but also has the lowest risk
+        
+        if( portfolio_return > int(user_expected_return) and
+            portfolio_std_dev < lowest_current_risk ):
+
+            BestWeights = weights
+            BestReturn = portfolio_return
+    
+        
     # Record and plot results
     results_frame = pd.DataFrame(results.T, columns=['ret', 'stdev', 'sharpe'] )
 
-    #plt.scatter(results_frame.stdev, results_frame.ret, c=results_frame.sharpe, cmap='RdYlBu')
-    #plt.colorbar()
-    #plt.show()
-    ## PieChart
-
-    #labels = 'AAPL', 'AMZN', 'MSFT', 'TSLA'
     labels = 'AMZN', stock1, stock2, stock3
    
     fig1, ax1 = plt.subplots()
@@ -87,7 +91,8 @@ def OptimizePortfolio(stock1, stock2, stock3):
 
     plt.savefig('static/images/pie_chart.png', bbox_inches='tight')
 
-    return currentSharpe
+    
+    return BestReturn
 
 
 
