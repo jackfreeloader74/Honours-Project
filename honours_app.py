@@ -7,6 +7,7 @@ import pdfkit
 app = Flask(__name__, static_folder='static')
 config = pdfkit.configuration(wkhtmltopdf='C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe')
 
+Return = 0
 
 @app.route("/")
 def main():
@@ -16,18 +17,24 @@ def main():
 @app.route('/ShowPortfolio')
 def ShowPortfolio():
     print("Showing")
-    return render_template('portfolio_summary.html', name = 'Portfolio Weights', url ='static/images/pie_chart.png')
+    return render_template('portfolio_summary.html', name = 'Portfolio Weights', expected = Return, 
+                           url ='static/images/pie_chart.png')
     
 @app.route('/generatePortfolio', methods=['POST'])
 def generatePortfolio():
 
+    # Obtain expected return from input
+    expected_return = request.form['expectedReturn']
+
+    print("Expected return ", expected_return);
+    
     # Obtain tickers from user input
     _ticker1 = request.form['inputTicker1']
     _ticker2 = request.form['inputTicker2']
     _ticker3 = request.form['inputTicker3']
     
    
-    #Sharpe = hp.OptimizePortfolio(_ticker1, _ticker2, _ticker3 )
+    Return = hp.OptimizePortfolio(_ticker1, _ticker2, _ticker3, expected_return )
     
     return redirect('/ShowPortfolio')
   
