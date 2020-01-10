@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+ 
+<head>
+    <title>Python Flask Bucket List App</title>
+ 
+	<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+	<script src="../static/js/jquery-1.11.2.js"></script>
+	<script src="../static/js/Portfolio.js"></script>
+</head>
+ 
+<body>
+ 
+    <div class="container">
+        <div class="header">
+            <nav>
+                <ul class="nav nav-pills pull-right">
+                    <li role="presentation" class="active"><a href="/logout">Home</a>                  
+                   
+                    </li>
+                </ul>
+            </nav>
+            <h3 class="text-muted">Portfolio Summary</h3>
+        </div>
+		
+		<table class="table table-dark">
+		  <thead>
+			<tr>
+			  <th scope="col">#</th>
+			  <th scope="col">Stock</th>
+			  <th scope="col">Weight (%)</th>
+			</tr>
+		  </thead>
+		  <tbody>
+			<tr>
+			  <th scope="row">1</th>
+			  <td>{{ t1 }}</td>
+			  <td>{{ w1 }}</td>
+			</tr>
+			<tr>
+			  <th scope="row">2</th>
+			  <td>{{ t2 }}</td>
+			  <td>{{ w2 }}</td>
+			</tr>
+			<tr>
+			  <th scope="row">3</th>
+			  <td>{{  t3 }}</td>
+			  <td>{{ w3 }}</td>	
+			</tr>
+			<tr>
+			  <th scope="row">4</th>
+			  <td>{{ t4 }}</td>
+			  <td>{{ w4 }}</td>	
+			</tr>
+		  </tbody>
+		</table>
+      
+ 
+        <div class="row marketing">
+            <div class="col-lg-6">
+                
+				<p>Expected Return: {{ expected }}%</p>
+				<img src={{ url }} alt="Chart" height="300" width="300">
+				
+				<form class="form-signin" action="/generatePDF" method="post">
+					<button id="exportToPdfBtn" class="btn btn-lg btn-primary btn-block" type="submit">Export Portfolio to PDF</button>
+				</form>	
+				
+            </div>
+			
+			
+			
+			
+            <div class="col-lg-6">
+             
+            </div>
+        </div>
+ 
+        <footer class="footer">
+          
+        </footer>
+ 
+    </div>
+</body>
+ 
+</html>
