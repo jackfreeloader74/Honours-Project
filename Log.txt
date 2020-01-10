@@ -56,6 +56,25 @@ Change optimization to find based on that risk
 
 
 
+10th January
+
+Ticker Validation - Test if tickers are case sensitive. If they are they input will need to be capitalized
+Invalid tickers - Find a way to return a friendly user error to say that the ticker they provided is not valid
+Ticker Sorting -> For the algorithm to work the tickers must be provided alphabetically. User input will need to be sorted
+GeneratePDF not working. Need to investigate
+
+For report, can talk about optimization code:
+
+Use adj Close to calculate returns, what is this and why do we use it?
+
+
+
+
+
+
+
+
+
 
 
 
