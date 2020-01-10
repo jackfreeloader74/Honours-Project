@@ -34,18 +34,23 @@
 		  <tbody>
 			<tr>
 			  <th scope="row">1</th>
-			  <td>Mark</td>
-			  <td>Otto</td>
+			  <td>{{ t1 }}</td>
+			  <td>{{ w1 }}</td>
 			</tr>
 			<tr>
 			  <th scope="row">2</th>
-			  <td>Jacob</td>
-			  <td>Thornton</td>
+			  <td>{{ t2 }}</td>
+			  <td>{{ w2 }}</td>
 			</tr>
 			<tr>
 			  <th scope="row">3</th>
-			  <td>Larry</td>
-			  <td>the Bird</td>	
+			  <td>{{  t3 }}</td>
+			  <td>{{ w3 }}</td>	
+			</tr>
+			<tr>
+			  <th scope="row">4</th>
+			  <td>{{ t4 }}</td>
+			  <td>{{ w4 }}</td>	
 			</tr>
 		  </tbody>
 		</table>
@@ -54,7 +59,7 @@
         <div class="row marketing">
             <div class="col-lg-6">
                 
-				<p>{{ expected }}</p>
+				<p>Expected Return: {{ expected }}%</p>
 				<img src={{ url }} alt="Chart" height="300" width="300">
 				
 				<form class="form-signin" action="/generatePDF" method="post">
