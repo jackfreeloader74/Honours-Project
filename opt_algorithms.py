@@ -5,12 +5,16 @@ import datetime as dt
 import matplotlib.pyplot as plt
 
 
-def OptimizePortfolio(stock1, stock2, stock3, user_expected_return):
+def OptimizePortfolio(tickers, user_expected_return):
 
     #stocks = [ 'AAPL','AMZN', 'MSFT', 'TSLA' ]
 
-    print(stock1, stock2, stock3)
-    stocks = [ 'AAPL', stock1, stock2, stock3]
+    
+    stocks = [ 'AAPL', tickers[0], tickers[1], tickers[2] ]
+
+    stocks = sorted(stocks)
+
+    print("STOCKS", stocks)
 
     data = web.DataReader( stocks, data_source="yahoo", start='01/01/2010', end='01/01/2020')['Adj Close']
     data.sort_index(inplace=True)
@@ -61,7 +65,7 @@ def OptimizePortfolio(stock1, stock2, stock3, user_expected_return):
             currentSharpe = results[2,i]
             
             # Save weights 
-            BestWeights = weights
+            #BestWeights = weights
 
 
         ## Find the portfolio with the expected return that matches the specified one
@@ -73,24 +77,25 @@ def OptimizePortfolio(stock1, stock2, stock3, user_expected_return):
         
             BestWeights = weights
             BestReturn = portfolio_return
-    
         
     # Record and plot results
     results_frame = pd.DataFrame(results.T, columns=['ret', 'stdev', 'sharpe'] )
 
-    labels = 'AMZN', stock1, stock2, stock3
+    labels = 'AAPL', tickers[0],tickers[1], tickers[2]
    
     fig1, ax1 = plt.subplots()
     colors = ['yellowgreen', 'gold', 'lightskyblue', 'lightcoral']
+
+  
     patches, texts = plt.pie(BestWeights, colors=colors, startangle=90)
    
     plt.legend(patches, labels, loc="best")
     ax1.axis('equal')
     plt.tight_layout()
 
-    plt.savefig('static/images/pie_chart.png', bbox_inches='tight')
+    plt.savefig('static\\images\\pie_chart.png', bbox_inches='tight')
 
-    print("Best return ", BestReturn)
+    
     return BestReturn, BestWeights
 
 
