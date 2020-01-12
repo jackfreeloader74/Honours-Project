@@ -9,7 +9,8 @@ import ast
 
 
 app = Flask(__name__)
-config = pdfkit.configuration(wkhtmltopdf='C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe')
+config = pdfkit.configuration(wkhtmltopdf='C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe')
+
 
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
@@ -71,14 +72,27 @@ def generatePortfolio():
   
   
 
-@app.route('/generatePDF', methods=['POST'])
+@app.route('/generatePDF', methods=['GET'])
 def generatePDF():
-    #pdfkit.from_file('templates\\portfolio_summary.html', 'static\\images\\portfolio.pdf',configuration=config)
+    
+    pdfkit.from_file('portfolio_summary.html', 'static/images/portfolio.pdf',configuration=config)
 
-    pdfkit.from_file('templates\\portfolio_summary.html', 'portfolio.pdf',configuration=config)
+
+    
+    return send_file('static/images/portfolio.pdf')    
+
+    #rendered = render_template('portfolio_summary.html')
+    #pdf = pdfkit.from_string(rendered, False)
 
 
-    return flask.redirect(flask.url_for(filename='portfolio.pdf'), code=301)
+    """response = make_response(pdf)
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = 'inline; filename=portfolio.pdf'
+
+    return response
+    """
+    
+
 
 
 
