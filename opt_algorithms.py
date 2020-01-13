@@ -5,6 +5,9 @@ import datetime as dt
 import matplotlib.pyplot as plt
 
 
+url = "https://finance.yahoo.com/quote/{}/history"
+
+
 def OptimizePortfolio(tickers, user_expected_return):
 
     #stocks = [ 'AAPL','AMZN', 'MSFT', 'TSLA' ]
@@ -12,12 +15,19 @@ def OptimizePortfolio(tickers, user_expected_return):
     
     stocks = [ 'AAPL', tickers[0], tickers[1], tickers[2] ]
 
-    stocks = sorted(stocks)
+    #data = web.DataReader( stocks_, data_source="yahoo", start='01/01/2010', end='01/01/2020')['Adj Close']
 
-    print("STOCKS", stocks)
+    stocks = sorted(stocks)
+    
 
     data = web.DataReader( stocks, data_source="yahoo", start='01/01/2010', end='01/01/2020')['Adj Close']
     data.sort_index(inplace=True)
+
+    for ticker in stocks:
+        if data[ticker].isnull().all():
+            return False, ticker
+
+  
 
     num_portfolios = 15
 
@@ -99,10 +109,15 @@ def OptimizePortfolio(tickers, user_expected_return):
     return BestReturn, BestWeights
 
 
+def _in_chunks(seq, size):
+    """
+    Return sequence in 'chunks' of size defined by size
+    """
+    return (seq[pos:pos + size] for pos in range(0, len(seq), size))
 
 
-
-
+def _get_params(self, *args, **kwargs):
+        raise NotImplementedError
 
 
 

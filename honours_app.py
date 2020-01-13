@@ -62,13 +62,17 @@ def generatePortfolio():
     tickers = sorted(tickers)
     
    
-
     # Perform Optimization 
     Return, weights = hp.OptimizePortfolio(tickers, expected_return )
-  
-    weights = list(weights)
 
-    return redirect(url_for('.ShowPortfolio', Return=Return, weights=str(weights), tickers=str(tickers) ) )
+    if Return == False:  
+        # Optimization failed - Invalid ticker
+        return ("Invalid Ticker Entered: %s" % weights)
+        
+    else:
+        weights = list(weights)
+
+        return redirect(url_for('.ShowPortfolio', Return=Return, weights=str(weights), tickers=str(tickers) ) )
   
   
 
@@ -82,22 +86,10 @@ def ShowPDF():
 def generatePDF():
 
     expected_return = request.args.get('Return')
-    print("DATzzzz", expected_return)
-    
-    #pdfkit.from_file('templates/portfolio_pdf.html', 'static/images/portfolio.pdf',configuration=config)
-
-    rendered = render_template('portfolio_pdf.html', expected_return=expected_return)
+    rendered = render_template('portfolio_pdf.html', expected_return=expected_return,
+                               url='C:/Users/marc.smith/AppData/Local/Programs/Python/Python37-32/static/images/pie_chart.png')
     pdf = pdfkit.from_string(rendered, 'static/images/portfolio.pdf', configuration=config)
 
-    
-    #return send_file('static/images/portfolio.pdf')    
-
-    #response = make_response(pdf)
-    #response.headers['Content-Type'] = 'application/pdf'
-    #response.headers['Content-Disposition'] = 'inline; filename=portfolio.pdf'
-
-
-    #return redirect(url_for('.ShowPDF') )
 
     return "PDF Generated successfully"
     
