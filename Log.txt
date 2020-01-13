@@ -70,6 +70,31 @@ Use adj Close to calculate returns, what is this and why do we use it?
 
 
 
+13th Jan -------------------------------------------------------------------------------------------------------------------------------
+
+Fixed PDF generation. Problem was wkhtmltopdf fails to identify certain bootstrap html/css
+
+I have created an API specification that tries to outline the different requests that the server needs to be able to handle. Includes
+appropriate response codes (404, 500 etc...), the method used (POST, GET), the URL and the response format. (HTML, plaintext etc..)
+
+Had to fix an issue with browser storing data in cache. In particular this was an image the client was pulling from the server and
+was not being updated properly. This was done by disabling cache for the application
+
+I added the mechanism to validate tickers. Now i need to format the response correctly so when user puts in an invalid ticker, 
+a message shows up on the idnex page saying "Ticker X is invalid. Please enter a valid ticker".
+
+Current priorities are:
+
+1) Add complete response messsage to index screen for an invalid ticker
+2) Add complete portfolio info to PDF (weights, tickers etc)
+
+
+Side tasks:
+
+1) Add dynamic loading screen icon to index page for portfolio generation
+2) Round the weights of the optimized portfolio before redirecting to the new page ( Makes the URL look tidier)
+3) General CSS changes to improve visual appeal
+4) Create Gantt chart summarising all remaining tasks for the project
 
 
 
@@ -78,6 +103,26 @@ Use adj Close to calculate returns, what is this and why do we use it?
 
 
 
+
+
+
+
+
+
+
+
+LIST OF PACKAGES REQUIRED TO RUN APPLICAITON
+
+
+Python3
+Flask
+Pandas
+Pandas datareader
+wkhtmltopdf
+pdfkit
+matplotlib
+numpy
+ast
 
 
 
