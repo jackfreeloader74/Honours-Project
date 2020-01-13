@@ -21,21 +21,24 @@ $(function() {
 $(function() {
     $('#exportToPdfBtn').click(function() {	
 		
-		var exp_return = $('expectedReturn').val()
+		var exp_return = $("p").eq(1).text()
+		
 		console.log("Return " + exp_return)
 		
+		var data = {
+			Return: exp_return
+		}
 		
         $.ajax({
             url: '/generatePDF',
-            data: "stuff",
+            data: data,
             type: 'GET',
             success: function(response) {
-                window.location.href = '/generatePDF'
+                window.location.href = '/ShowPDF'
 				console.log(response);
-				
             },
             error: function(error) {
-                console.log(error);
+               
             }
         });  
     });

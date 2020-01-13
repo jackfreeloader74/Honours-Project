@@ -72,26 +72,36 @@ def generatePortfolio():
   
   
 
+@app.route('/ShowPDF')
+def ShowPDF():
+    return send_file('static/images/portfolio.pdf')
+       
+    
+
 @app.route('/generatePDF', methods=['GET'])
 def generatePDF():
+
+    expected_return = request.args.get('Return')
+    print("DATzzzz", expected_return)
     
-    pdfkit.from_file('portfolio_summary.html', 'static/images/portfolio.pdf',configuration=config)
+    #pdfkit.from_file('templates/portfolio_pdf.html', 'static/images/portfolio.pdf',configuration=config)
 
+    rendered = render_template('portfolio_pdf.html', expected_return=expected_return)
+    pdf = pdfkit.from_string(rendered, 'static/images/portfolio.pdf', configuration=config)
 
     
-    return send_file('static/images/portfolio.pdf')    
+    #return send_file('static/images/portfolio.pdf')    
 
-    #rendered = render_template('portfolio_summary.html')
-    #pdf = pdfkit.from_string(rendered, False)
+    #response = make_response(pdf)
+    #response.headers['Content-Type'] = 'application/pdf'
+    #response.headers['Content-Disposition'] = 'inline; filename=portfolio.pdf'
 
 
-    """response = make_response(pdf)
-    response.headers['Content-Type'] = 'application/pdf'
-    response.headers['Content-Disposition'] = 'inline; filename=portfolio.pdf'
+    #return redirect(url_for('.ShowPDF') )
 
-    return response
-    """
+    return "PDF Generated successfully"
     
+
 
 
 
