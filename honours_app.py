@@ -21,14 +21,20 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 def main():
     return render_template('index.html')
 
+@app.route("/Invalid")
+def Invalid():
+    message = request.args['message']
+    return render_template('index.html', message=message)
+
+
+
 @app.route('/ShowPortfolio')
 def ShowPortfolio():
-    print("Showing")
+
     Return = request.args['Return']
     Weights = request.args['weights']
     Tickers = request.args['tickers']
-
-    print("Tickers", Tickers)
+  
 
     # url_for converts the array to a string, literal_eval converts it back to an array
     Weights = ast.literal_eval(Weights)
@@ -42,22 +48,22 @@ def ShowPortfolio():
     ## REMEMBER CURRENTLY USING STATIC apple ticker
     return render_template('portfolio_summary.html', name = 'Portfolio Weights', expected = Return, 
                            w1=Weights[0],w2=Weights[1],w3=Weights[2],w4=Weights[3],
-                           t1="AAPL", t2=Tickers[0], t3=Tickers[1], t4=Tickers[2], url ='static/images/pie_chart.png')
+                           t1=Tickers[0], t2=Tickers[1], t3=Tickers[2], t4=Tickers[3], url ='static/images/pie_chart.png')
     
 @app.route('/generatePortfolio', methods=['POST'])
 def generatePortfolio():
 
     # Obtain expected return from input
     expected_return = request.form['expectedReturn']
-
-    
+  
     # Obtain tickers from user input
     _ticker1 = request.form['inputTicker1']
     _ticker2 = request.form['inputTicker2']
     _ticker3 = request.form['inputTicker3']
+    _ticker4 = request.form['inputTicker4']
 
     # Transorm tickers to appropriate format (Sort + Capitalize)
-    tickers = [_ticker1,_ticker2, _ticker3 ]
+    tickers = [_ticker1,_ticker2, _ticker3, _ticker4 ]
     tickers = [ element.upper() for element in tickers ]
     tickers = sorted(tickers)
     
@@ -67,11 +73,13 @@ def generatePortfolio():
 
     if Return == False:  
         # Optimization failed - Invalid ticker
-        return ("Invalid Ticker Entered: %s" % weights)
+        #return ("Invalid Ticker Entered: %s" % weights)
+
+        message = "Invalid Ticker Entered: %s" % weights     
+        return redirect(url_for('.Invalid', message=message) )
         
     else:
-        weights = list(weights)
-
+        weights = list(weights)        
         return redirect(url_for('.ShowPortfolio', Return=Return, weights=str(weights), tickers=str(tickers) ) )
   
   
@@ -85,10 +93,31 @@ def ShowPDF():
 @app.route('/generatePDF', methods=['GET'])
 def generatePDF():
 
+    # Get portfolio details so they can be applied to the PDF
+
+    # Grab parameters from get request
     expected_return = request.args.get('Return')
+    tickers = request.args.get('Tickers')
+    weights = request.args.get('Weights')
+
+
+    # Convert tickers and weights from string format to arrays
+    tickers = ast.literal_eval(tickers);
+    weights = ast.literal_eval(weights);
+
+
+    # Render html file with all required data
     rendered = render_template('portfolio_pdf.html', expected_return=expected_return,
-                               url='C:/Users/marc.smith/AppData/Local/Programs/Python/Python37-32/static/images/pie_chart.png')
+                               url='C:/Users/marc.smith/AppData/Local/Programs/Python/Python37-32/static/images/pie_chart.png',
+                               t1=tickers[0], t2=tickers[1], t3=tickers[2], t4=tickers[3],
+                               w1=weights[0],w2=weights[1],w3=weights[2],w4=weights[3])
+
+
+
+    # This only generates the PDF file. Once the user processes the response for their GET request,
+    # they will be redirected to /ShowPDF
     pdf = pdfkit.from_string(rendered, 'static/images/portfolio.pdf', configuration=config)
+    
 
 
     return "PDF Generated successfully"
