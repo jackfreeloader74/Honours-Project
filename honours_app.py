@@ -32,9 +32,11 @@ def Invalid():
 def ShowPortfolio():
 
     Return = request.args['Return']
+    Risk = request.args['Risk']
     Weights = request.args['weights']
     Tickers = request.args['tickers']
-  
+
+    Sharpe= round(float(Return)/float(Risk),2)
 
     # url_for converts the array to a string, literal_eval converts it back to an array
     Weights = ast.literal_eval(Weights)
@@ -46,9 +48,18 @@ def ShowPortfolio():
     
 
     ## REMEMBER CURRENTLY USING STATIC apple ticker
-    return render_template('portfolio_summary.html', name = 'Portfolio Weights', expected = Return, 
+    return render_template('portfolio_summary.html', name = 'Portfolio Weights',
+                           Return = Return,
+                           Sharpe = Sharpe,
+                           Risk= Risk,
                            w1=Weights[0],w2=Weights[1],w3=Weights[2],w4=Weights[3],
-                           t1=Tickers[0], t2=Tickers[1], t3=Tickers[2], t4=Tickers[3], url ='static/images/pie_chart.png')
+                           t1=Tickers[0], t2=Tickers[1], t3=Tickers[2], t4=Tickers[3],
+                           url_pie ='static/images/pie_chart.png',
+                           url_efficient ='static/images/efficient_frontier.png')
+
+
+
+
     
 @app.route('/generatePortfolio', methods=['POST'])
 def generatePortfolio():
@@ -62,25 +73,42 @@ def generatePortfolio():
     _ticker3 = request.form['inputTicker3']
     _ticker4 = request.form['inputTicker4']
 
+    
+    
     # Transorm tickers to appropriate format (Sort + Capitalize)
     tickers = [_ticker1,_ticker2, _ticker3, _ticker4 ]
     tickers = [ element.upper() for element in tickers ]
     tickers = sorted(tickers)
+
+    if len(tickers) != len(set(tickers)):
+
+        # Duplicate tickers
+        message = "Please do not include the same ticker more than once."     
+        return redirect(url_for('.Invalid', message=message) )
+        
+    elif float(expected_return) < 0:
+        ## Negative exp return
+        message = "Expected Return for portfolio must be positive"     
+        return redirect(url_for('.Invalid', message=message) )
     
    
     # Perform Optimization 
-    Return, weights = hp.OptimizePortfolio(tickers, expected_return )
+    Return, weights, Risk = hp.OptimizePortfolio(tickers, expected_return )  
 
-    if Return == False:  
+    ## Check if any of the tickers entered by the user is invalid
+    if Return == False:
+        
         # Optimization failed - Invalid ticker
-        #return ("Invalid Ticker Entered: %s" % weights)
-
         message = "Invalid Ticker Entered: %s" % weights     
         return redirect(url_for('.Invalid', message=message) )
         
     else:
         weights = list(weights)        
-        return redirect(url_for('.ShowPortfolio', Return=Return, weights=str(weights), tickers=str(tickers) ) )
+        return redirect(url_for('.ShowPortfolio',
+                                Return=Return,
+                                Risk=Risk,
+                                weights=str(weights),
+                                tickers=str(tickers)) )
   
   
 
@@ -97,6 +125,13 @@ def generatePDF():
 
     # Grab parameters from get request
     expected_return = request.args.get('Return')
+    risk = request.args.get('Risk')
+
+    print("Risk", float(risk))
+    print("ret", expected_return)
+
+    Sharpe = round(float(expected_return)/float(risk),2)
+    
     tickers = request.args.get('Tickers')
     weights = request.args.get('Weights')
 
@@ -107,8 +142,12 @@ def generatePDF():
 
 
     # Render html file with all required data
-    rendered = render_template('portfolio_pdf.html', expected_return=expected_return,
-                               url='C:/Users/marc.smith/AppData/Local/Programs/Python/Python37-32/static/images/pie_chart.png',
+    rendered = render_template('portfolio_pdf.html',
+                               Return=expected_return,
+                               Risk=risk,
+                               Sharpe=Sharpe,
+                               url_pie='C:/Users/marc.smith/AppData/Local/Programs/Python/Python37-32/static/images/pie_chart.png',
+                               url_efficient='C:/Users/marc.smith/AppData/Local/Programs/Python/Python37-32/static/images/efficient_frontier.png',
                                t1=tickers[0], t2=tickers[1], t3=tickers[2], t4=tickers[3],
                                w1=weights[0],w2=weights[1],w3=weights[2],w4=weights[3])
 
