@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
  
@@ -18,48 +19,71 @@
             <h3 id="testID" class="text-muted">Portfolio Summary</h3>
         </div>
 		
-		<table class="table table-dark">
-		  <thead>
-			<tr>
-			  <th scope="col">#</th>
-			  <th scope="col">Stock</th>
-			  <th scope="col">Weight (%)</th>
-			</tr>
-		  </thead>
-		  <tbody>
-			<tr>
-			  <th scope="row">1</th>
-			  <td>{{ t1 }}</td>
-			  <td>{{ w1 }}</td>
-			</tr>
-			<tr>
-			  <th scope="row">2</th>
-			  <td>{{ t2 }}</td>
-			  <td>{{ w2 }}</td>
-			</tr>
-			<tr>
-			  <th scope="row">3</th>
-			  <td>{{ t3 }}</td>
-			  <td>{{ w3 }}</td>	
-			</tr>
-			<tr>
-			  <th scope="row">4</th>
-			  <td>{{ t4 }}</td>
-			  <td>{{ w4 }}</td>	
-			</tr>
-		  </tbody>
-		</table>
+			<div id="load_icon" class="jumbotron">
+		
+			<table class="table table">
+				<thead>
+					<tr>
+						<th scope="col"></th>
+						<th scope="col">Annual Expected Return</th>
+						<th scope="col">Volatility</th>
+						<th scope="col">Sharpe Ratio</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<th scope="row"></th>
+							<td id="return">{{ Return }}</td>
+							<td id="risk">{{ Risk }}</td>
+							<td id="sharpe">{{ Sharpe }}</td>
+					</tr>
+				</tbody>
+			</table>
+		
+		
+			<table class="table table">
+			  <thead>
+				<tr>
+				  <th scope="col">#</th>
+				  <th scope="col">Stock</th>
+				  <th scope="col">Weight (%)</th>
+				</tr>
+			  </thead>
+			  <tbody>
+				<tr>
+				  <th scope="row">1</th>
+				  <td id="t1">{{ t1 }}</td>
+				  <td id="w1">{{ w1 }}</td>
+				</tr>
+				<tr>
+				  <th scope="row">2</th>
+				  <td id="t2">{{ t2 }}</td>
+				  <td id="w2">{{ w2 }}</td>
+				</tr>
+				<tr>
+				  <th scope="row">3</th>
+				  <td id="t3">{{ t3 }}</td>
+				  <td id="w3">{{ w3 }}</td>	
+				</tr>
+				<tr>
+				  <th scope="row">4</th>
+				  <td id="t4">{{ t4 }}</td>
+				  <td id="w4">{{ w4 }}</td>	
+				</tr>
+			  </tbody>
+			</table>
+		  		
+			
+			<img src={{ url_pie }} alt="Chart" height="300" width="300">	
+			<img src={{ url_efficient }} alt="Chart" height="300" width="300">	 
+		</div>
+	  
+	  
       
  
         <div class="row marketing">
             <div class="col-lg-6">
-                
-				<div class="return_data">
-				
-					<h1>Return: {{ expected_return }}</h1>
-				</div>
-				
-				<img src={{ url }} alt="Chart" height="300" width="300">		
+           
             </div>
 			
 			
@@ -78,3 +102,4 @@
 </body>
  
 </html>
+

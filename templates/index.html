@@ -4,8 +4,10 @@
 <head>
     <title>Portfolio Optimization Tool</title>
  
+	<link href="static\portfolio.css" rel="stylesheet">
 	<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
-    <script src="../static/js/jquery-1.11.2.js"></script>
+    
+	<script src="../static/js/jquery-1.11.2.js"></script>
     <script src="../static/js/Portfolio.js"></script>
 </head>
  
@@ -18,15 +20,31 @@
                    
               
                 </ul>
+				
+				<h3 class="text-muted"></h3>
             </nav>
-            <h3 class="text-muted">Portfolio Optimization App</h3>
+            
         </div>
  
         <div id="load_icon" class="jumbotron">
+			<h3 class="text-muted">Portfolio Optimization App</h3>
             <h4>{{ message }}</h4>
             <p class="lead"></p>
 			
-			<form action="/generatePortfolio" method="post">
+		<div class="dropdown">
+  <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+    Dropdown button
+  </button>
+  <div class="dropdown-menu">
+    <a class="dropdown-item" href="#">Link 1</a>
+    <a class="dropdown-item" href="#">Link 2</a>
+    <a class="dropdown-item" href="#">Link 3</a>
+  </div>
+</div>
+			
+			
+						
+			<form name="myForm" action="/generatePortfolio" onsubmit="return validateForm()" method="post">
 				<div class="form-group">
 					<label for="expectedReturn">Expected Return</label>
 					<input type="name" name="expectedReturn" id="expectedReturn" class="form-control" placeholder="Expected Return (%)" required autofocus>
@@ -40,8 +58,12 @@
 					<input type="name" name="inputTicker3" id="inputTicker3" class="form-control" placeholder="Stock Ticker 3" required>
 					<label for="inputTicker4" class="sr-only"></label>
 					<input type="name" name="inputTicker4" id="inputTicker4" class="form-control" placeholder="Stock Ticker 4" required>
+					<small id="emailHelp" class="form-text text-muted">Enter the stocks that you want to have in your portfolio in ticker form. E.g. Amazon = AMZN.</small>
 					<button id="generatePortfolioBtn" class="btn btn-lg btn-primary btn-block" type="submit">Generate Portfolio</button>
 			</form>
+			
+			<small id="emailHelp" class="form-text text-muted">WARNING: The creator of this tool is not a professional in the finance industry and you should therefore take any information
+			from it with caution.</small>
 		</div>	
 			
 			
@@ -51,6 +73,8 @@
         <div class="row marketing">
             <div class="col-lg-6">
                 
+		
+				
             </div>
  
             <div class="col-lg-6">
