@@ -99,6 +99,30 @@ Side tasks:
 
 
 
+January 16th
+
+COMPLETED:
+Added the response message to index screen for invalid ticker.
+Added weights and tickers to PDF. 
+Added risk and sharpe value to summary page and pdf
+Added efficient frontier graph to summary and pdf 
+Added Client and server validation for putting in duplicate tickers
+Changed summary and pdf to look better
+
+Current Priorities are:
+
+Update wireframe to include dropdown for optimziation methods
+Implement dropdown
+Create gannt chart
+
+Side tasks
+  Load icon
+  Round weights before they are put in the URL
+
+
+
+
+
 
 
 
