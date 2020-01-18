@@ -27,38 +27,41 @@
         </div>
  
         <div id="load_icon" class="jumbotron">
-			<h3 class="text-muted">Portfolio Optimization App</h3>
+			<h3 id="title" class="text-muted">Portfolio Optimization App</h3>
             <h4>{{ message }}</h4>
             <p class="lead"></p>
 			
-		<div class="dropdown">
-  <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-    Dropdown button
-  </button>
-  <div class="dropdown-menu">
-    <a class="dropdown-item" href="#">Link 1</a>
-    <a class="dropdown-item" href="#">Link 2</a>
-    <a class="dropdown-item" href="#">Link 3</a>
-  </div>
-</div>
+		
 			
 			
 						
 			<form name="myForm" action="/generatePortfolio" onsubmit="return validateForm()" method="post">
+				
+				<label class="switch">
+					<input type="checkbox" for="checkBox" id="checkBox" name="checkBox">
+					<span class="slider round"></span>
+				</label>
+				
+				
+				
 				<div class="form-group">
-					<label for="expectedReturn">Expected Return</label>
-					<input type="name" name="expectedReturn" id="expectedReturn" class="form-control" placeholder="Expected Return (%)" required autofocus>
-					<small id="emailHelp" class="form-text text-muted">Enter the minimum rate of return for your desired portfolio.</small>
-					<label for="expectedReturn" class="sr-only">Name</label>
+					<label id="expectedReturnLabel" for="expectedReturn">Expected Return</label>
+					<input type="name" name="expectedReturn" required="false" id="expectedReturn" class="form-control" placeholder="Expected Return (%)">
+					<small id="returnHelp" class="form-text text-muted">Enter the minimum rate of return for your desired portfolio.</small>
 				</div>
+				
 					<input type="name" name="inputTicker1" id="inputTicker1" class="form-control" placeholder="Stock Ticker 1" required autofocus>
 					<label for="inputTicker2" class="sr-only"></label>
+					
 					<input type="name" name="inputTicker2" id="inputTicker2" class="form-control" placeholder="Stock Ticker 2" required autofocus>
 					<label for="inputTicker3" class="sr-only"></label>
+					
 					<input type="name" name="inputTicker3" id="inputTicker3" class="form-control" placeholder="Stock Ticker 3" required>
 					<label for="inputTicker4" class="sr-only"></label>
+					
 					<input type="name" name="inputTicker4" id="inputTicker4" class="form-control" placeholder="Stock Ticker 4" required>
 					<small id="emailHelp" class="form-text text-muted">Enter the stocks that you want to have in your portfolio in ticker form. E.g. Amazon = AMZN.</small>
+					
 					<button id="generatePortfolioBtn" class="btn btn-lg btn-primary btn-block" type="submit">Generate Portfolio</button>
 			</form>
 			
