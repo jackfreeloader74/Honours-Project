@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 url = "https://finance.yahoo.com/quote/{}/history"
 
 
-def OptimizePortfolio(tickers, user_expected_return):
+def OptimizePortfolio(tickers, user_expected_return, FindBestRatio):
 
      
     stocks = [ tickers[0], tickers[1], tickers[2], tickers[3] ]
@@ -22,12 +22,12 @@ def OptimizePortfolio(tickers, user_expected_return):
 
     for ticker in stocks:
         if data[ticker].isnull().all():
-            return False, ticker
+            return False, ticker, None
 
 
     # Start Optimization (MPT)
 
-    num_portfolios = 15
+    num_portfolios = 1000
 
     # convert daily stock prices into daily returns
     returns = data.pct_change()
@@ -65,54 +65,58 @@ def OptimizePortfolio(tickers, user_expected_return):
         
         # Store Sharpe Ratio  ( return / volatility )
         results[2,i] = results[0,i] / results[1,i]
-
-        if( results[2,i] > currentSharpe ):
-            currentSharpe = results[2,i]
+   
+        ## Find the portfolio with the best sharpe ratio
+        if FindBestRatio:
+             if( results[2,i] > currentSharpe ):
+                currentSharpe = results[2,i]
+                BestWeights = weights
+                BestReturn = portfolio_return
+                currentRisk = round(results[1,i],2)
             
-            # Save weights 
-            #BestWeights = weights
+        else:
+            ## Find the portfolio with the expected return that is greater than or equal to the specified return
+                ## but also has the lowest risk    
+            if( portfolio_return > float(user_expected_return) and
+                portfolio_std_dev < lowest_current_risk ):
 
+            
+                BestWeights = weights
+                BestReturn = portfolio_return
+                currentRisk = round(results[1,i],2)
 
-        ## Find the portfolio with the expected return that matches the specified one
-            ## but also has the lowest risk
-        
-        if( portfolio_return > float(user_expected_return) and
-            portfolio_std_dev < lowest_current_risk ):
-
-        
-            BestWeights = weights
-            BestReturn = portfolio_return
         
     # Record and plot results
+    plt.cla()
+    plt.clf()
+
     results_frame = pd.DataFrame(results.T, columns=['ret', 'stdev', 'sharpe'] )
+    plt.scatter(results_frame.stdev,results_frame.ret,c=results_frame.sharpe,cmap='RdYlBu')
+    plt.colorbar()
+    plt.savefig('static\\images\\efficient_frontier.png')
+
+    plt.cla()
+    plt.clf()
+    
+
+
+
 
     labels = tickers[0],tickers[1],tickers[2], tickers[3]
-   
+
     fig1, ax1 = plt.subplots()
     colors = ['yellowgreen', 'gold', 'lightskyblue', 'lightcoral']
-
-  
     patches, texts = plt.pie(BestWeights, colors=colors, startangle=90)
-   
     plt.legend(patches, labels, loc="best")
     ax1.axis('equal')
     plt.tight_layout()
-
     plt.savefig('static\\images\\pie_chart.png', bbox_inches='tight')
 
     
-    return BestReturn, BestWeights
+    return BestReturn, BestWeights, currentRisk
 
 
-def _in_chunks(seq, size):
-    """
-    Return sequence in 'chunks' of size defined by size
-    """
-    return (seq[pos:pos + size] for pos in range(0, len(seq), size))
 
-
-def _get_params(self, *args, **kwargs):
-        raise NotImplementedError
 
 
 

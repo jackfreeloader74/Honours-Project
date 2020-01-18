@@ -60,20 +60,37 @@ def ShowPortfolio():
 
 
 
+
+"""
+Checkboxe values only get posted in a form request if the checkbox is "on".
+This means finding the value from the form needs to be wrapped in a try catch
+"""
     
 @app.route('/generatePortfolio', methods=['POST'])
 def generatePortfolio():
+    
+    BestRatio = True;
 
-    # Obtain expected return from input
+
+    try:
+        Checked = request.form['checkBox']
+    except:
+        Checked = "off";
+
+
+    # If they selected the checkbox, dont use the expected return value in opt code
+    if Checked == "on":
+        BestRatio = False;
+
+
     expected_return = request.form['expectedReturn']
-  
+
     # Obtain tickers from user input
     _ticker1 = request.form['inputTicker1']
     _ticker2 = request.form['inputTicker2']
     _ticker3 = request.form['inputTicker3']
     _ticker4 = request.form['inputTicker4']
 
-    
     
     # Transorm tickers to appropriate format (Sort + Capitalize)
     tickers = [_ticker1,_ticker2, _ticker3, _ticker4 ]
@@ -86,16 +103,19 @@ def generatePortfolio():
         message = "Please do not include the same ticker more than once."     
         return redirect(url_for('.Invalid', message=message) )
         
-    elif float(expected_return) < 0:
-        ## Negative exp return
+    elif (BestRatio==False) and invalid_return(expected_return):   
         message = "Expected Return for portfolio must be positive"     
         return redirect(url_for('.Invalid', message=message) )
     
-   
-    # Perform Optimization 
-    Return, weights, Risk = hp.OptimizePortfolio(tickers, expected_return )  
+    
 
-    ## Check if any of the tickers entered by the user is invalid
+    # Perform Optimization 
+    Return, weights, Risk = hp.OptimizePortfolio(tickers, expected_return, BestRatio)  
+
+
+
+
+    # Check if any of the tickers entered by the user is invalid
     if Return == False:
         
         # Optimization failed - Invalid ticker
@@ -111,6 +131,11 @@ def generatePortfolio():
                                 tickers=str(tickers)) )
   
   
+
+
+
+
+
 
 @app.route('/ShowPDF')
 def ShowPDF():
@@ -161,6 +186,19 @@ def generatePDF():
 
     return "PDF Generated successfully"
     
+
+
+
+
+def invalid_return(expected_return):
+
+    expected_return = float(expected_return)
+
+    if(expected_return <= 0 ):
+        return True;
+
+    return False;
+
 
 
 
