@@ -121,9 +121,34 @@ Side tasks
 
 
 
+17th Jan
+
+Had meeting with david + discussions over email
+  
+ Main points were that it could be worth having a few saved templates of portfolio tickers just for the sake of testing and doing a demo
+ (Saves me having to type in the symbols every time. Linked to this is a potential addition (only if there is enough time, is to add a sql database that can store portfolio details). I suppose this would also require a new page + service to retrieve them. (theoretically it would be linked to a user but for the sake of the project it could just be you get access to all portfolios in the db)
+ 
+ Second point, when displaying the weights of the portfolio e.g. 30% of AMZN, rather than just a %, also display this in raw numbers.
+ E.g. in a £10,000 investment this £30,000 amazon purchase would be equal to x amount of shares
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
 
 
+18th Jan
 
+from discussion with dad
+
+Could include a graph that highlightes the portfolios value over time if invested in 2015-2020. Could also include hard numbers
+like if you invested in this in 2015 by 2020 the return would be x
+
+Fixed issue with checkbox. In forms, the value of the checkbox is only posted when it is "on". Had to wrap server side capturing of checkbox value in a try catch.
 
 
 
