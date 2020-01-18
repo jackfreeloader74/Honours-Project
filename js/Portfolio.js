@@ -1,20 +1,24 @@
+
+
+
 $(function() {
-    $('#generatePortfolioBtn').click(function() {
-		
-	
-        /*$.ajax({
-            url: '/generatePortfolio',
-            data: $('form').serialize(),
-            type: 'POST',
-            success: function(response) {
-                console.log(response);
-            },
-            error: function(error) {
-                console.log(error);
-            }
-        }); */
-    });
+		init();
 });
+
+
+function init()
+{
+	
+	$("#expectedReturn").hide();
+	$("#expectedReturnLabel").hide();
+	$("#returnHelp").hide();
+	$("#expectedReturn").prop('required', false );
+	return true;
+};
+
+
+
+
 
 function checkIfArrayContainsDuplicates(arr) {
    
@@ -56,6 +60,8 @@ function validateForm() {
 	
 	tickers = [t1, t2, t3, t4]
 	
+	
+	
 	if( checkIfArrayContainsDuplicates(tickers) )
 	{
 		alert("Please do not include the same ticker more than once");
@@ -73,32 +79,32 @@ function validateForm() {
 	}
 	else
 		return true;
-	
-	
-	
 }
 
 
 $(function() {
-    $('#generatePortfolioBtn').click(function() {
-		
 	
-        /*$.ajax({
-            url: '/generatePortfolio',
-            data: $('form').serialize(),
-            type: 'POST',
-            success: function(response) {
-                console.log(response);
-            },
-            error: function(error) {
-                console.log(error);
-            }
-        }); */
-    });
+	$('#checkBox').click(function() {
+		
+		if(  $("#checkBox").is(":checked") ){
+			$("#expectedReturn").show();
+			$("#expectedReturnLabel").show();
+			$("#returnHelp").show();
+			
+			//$("#expectedReturn").prop('required', true );
+		}
+		else
+		{
+			//$("#expectedReturn").hide();
+			$("#expectedReturnLabel").hide();
+			$("#returnHelp").hide();
+			//$("#expectedReturn").val("")
+			$("#expectedReturn").prop('required', false );
+		}
+			
+	});
+	
 });
-
-
-
 
 
 $(function() {
