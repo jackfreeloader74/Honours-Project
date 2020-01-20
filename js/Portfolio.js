@@ -95,16 +95,30 @@ $(function() {
 		}
 		else
 		{
-			//$("#expectedReturn").hide();
+			$("#expectedReturn").hide();
 			$("#expectedReturnLabel").hide();
 			$("#returnHelp").hide();
-			//$("#expectedReturn").val("")
+			$("#expectedReturn").val("")
 			$("#expectedReturn").prop('required', false );
 		}
 			
 	});
 	
 });
+
+
+
+$(function() {
+	
+	$("#preset").click(function() {
+		
+		$("#inputTicker1").val("AAPL");
+		$("#inputTicker2").val("AMZN");
+		$("#inputTicker3").val("TLSA");
+		$("#inputTicker4").val("XOM");
+	});
+});
+
 
 
 $(function() {
