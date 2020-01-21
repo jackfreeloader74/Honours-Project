@@ -151,8 +151,10 @@ like if you invested in this in 2015 by 2020 the return would be x
 Fixed issue with checkbox. In forms, the value of the checkbox is only posted when it is "on". Had to wrap server side capturing of checkbox value in a try catch.
 
 
+19/20th Jan
 
-
+Added a preset button that fills in the form with 4 static ticker symbols to reduce time for testing and during a demo
+Changed the rounding of the weights to occur before they are passed into the URL, making it look tidier
 
 
 
