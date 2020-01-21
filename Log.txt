@@ -1,5 +1,7 @@
 December 1st - Created mockup wireframes of what the application will look like/how it navigates
 
+-------------------------------------------------------------------------------------------------------------------------------
+
 
 December 10th - Wrote out a step by step plan on how to achieve a working prototype
 
@@ -42,7 +44,7 @@ December 10th - Wrote out a step by step plan on how to achieve a working protot
   
 
 
-23rd December
+23rd December--------------------------------------------------------------------------------------------------------------------------
 
 Managed to get a template image on server returned to the clients html page. This can be used for a matplotlib graph
 
@@ -56,7 +58,7 @@ Change optimization to find based on that risk
 
 
 
-10th January
+10th January----------------------------------------------------------------------------------------------------------------------------
 
 Ticker Validation - Test if tickers are case sensitive. If they are they input will need to be capitalized
 Invalid tickers - Find a way to return a friendly user error to say that the ticker they provided is not valid
@@ -99,7 +101,7 @@ Side tasks:
 
 
 
-January 16th
+January 16th----------------------------------------------------------------------------------------------------------------------------
 
 COMPLETED:
 Added the response message to index screen for invalid ticker.
@@ -121,7 +123,7 @@ Side tasks
 
 
 
-17th Jan
+17th Jan -------------------------------------------------------------------------------------------------------------------------------
 
 Had meeting with david + discussions over email
   
@@ -141,7 +143,7 @@ Had meeting with david + discussions over email
  
 
 
-18th Jan
+18th Jan -------------------------------------------------------------------------------------------------------------------------------
 
 from discussion with dad
 
@@ -150,6 +152,8 @@ like if you invested in this in 2015 by 2020 the return would be x
 
 Fixed issue with checkbox. In forms, the value of the checkbox is only posted when it is "on". Had to wrap server side capturing of checkbox value in a try catch.
 
+
+-------------------------------------------------------------------------------------------------------------------------------
 
 19/20th Jan
 
