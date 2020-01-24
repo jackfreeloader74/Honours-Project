@@ -1,0 +1,13 @@
+LIST OF PACKAGES REQUIRED TO RUN APPLICAITON
+
+
+Python3
+Flask
+Pandas
+Pandas datareader
+wkhtmltopdf
+pdfkit
+matplotlib
+numpy
+ast
+CurrencyConverter
