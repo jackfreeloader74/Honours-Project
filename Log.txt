@@ -180,8 +180,13 @@ Added functionality to calculate the number of shares that can be purchased. Thi
 summary page table.
 
 Had to consider rounding the share count but found out that you can purchase partial shares so no need to round down
-
 THIS NEW FEATURE NEEDS TO BE ADDED TO THE REQUIREMENTS
+
+Also realised that the stock value is in dollars but the cash value from the user is asked for in £. Had to use 
+currencyConverter library to do the conversion
+
+
+
 
 Next thing to work on could be the graph highlighting past portfolio performance (line graph)
 
