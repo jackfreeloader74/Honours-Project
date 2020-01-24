@@ -3,7 +3,7 @@ import numpy as np
 import pandas_datareader.data as web
 import datetime as dt
 import matplotlib.pyplot as plt
-
+from dateutil.relativedelta import relativedelta
 
 url = "https://finance.yahoo.com/quote/{}/history"
 
@@ -70,7 +70,7 @@ def OptimizePortfolio(tickers, user_expected_return, FindBestRatio):
         if FindBestRatio:
              if( results[2,i] > currentSharpe ):
                 currentSharpe = results[2,i]
-                BestWeights = weights
+                BestWeights = round_list(weights)
                 BestReturn = portfolio_return
                 currentRisk = round(results[1,i],2)
             
@@ -81,29 +81,81 @@ def OptimizePortfolio(tickers, user_expected_return, FindBestRatio):
                 portfolio_std_dev < lowest_current_risk ):
 
             
-                BestWeights = weights
+                BestWeights = round_list(weights)
                 BestReturn = portfolio_return
                 currentRisk = round(results[1,i],2)
 
         
-    # Record and plot results
+    # Efficient frontier graph
+    plot_efficient_chart( pd, results)
+
+    # Pie Chart
+    labels = tickers[0],tickers[1],tickers[2], tickers[3]
+    plot_pie_chart(labels, BestWeights)
+
+  
+    return BestReturn, BestWeights, currentRisk
+
+
+
+
+def CalculateShareVolume( tickers, weights, cash ):
+
+    share_list = [];
+
+    i=0
+    
+    for w in weights:
+
+        stock_cash_value = float(w) * float(cash)
+
+        #print("Stock cash value", stock_cash_value)
+        share_volume = round(stock_cash_value / share_price( tickers[i]), 2)
+        #print("Share volume ", tickers[i], share_volume)
+        share_list.append(share_volume)
+        i += 1
+
+
+    print("Share Volume list", share_list)
+                
+    
+    return share_list
+
+
+def share_price( ticker ):
+
+    one = dt.datetime.now()
+    date_formated = one.strftime("%d/%m/%Y")
+
+    stocks = [ticker]
+    
+    data = web.DataReader( stocks , data_source="yahoo", start=date_formated, end=date_formated)['Adj Close']
+    data.sort_index(inplace=True)
+
+
+   
+    
+    value = data.loc[data.index[0], ticker]
+
+
+
+    return value
+
+
+def plot_efficient_chart( pd, results):
+
     plt.cla()
     plt.clf()
-
     results_frame = pd.DataFrame(results.T, columns=['ret', 'stdev', 'sharpe'] )
     plt.scatter(results_frame.stdev,results_frame.ret,c=results_frame.sharpe,cmap='RdYlBu')
     plt.colorbar()
     plt.savefig('static\\images\\efficient_frontier.png')
 
+def plot_pie_chart(labels, BestWeights):
+
     plt.cla()
     plt.clf()
     
-
-
-
-
-    labels = tickers[0],tickers[1],tickers[2], tickers[3]
-
     fig1, ax1 = plt.subplots()
     colors = ['yellowgreen', 'gold', 'lightskyblue', 'lightcoral']
     patches, texts = plt.pie(BestWeights, colors=colors, startangle=90)
@@ -112,16 +164,13 @@ def OptimizePortfolio(tickers, user_expected_return, FindBestRatio):
     plt.tight_layout()
     plt.savefig('static\\images\\pie_chart.png', bbox_inches='tight')
 
+
+
+
+def round_list(param_list):
     
-    return BestReturn, BestWeights, currentRisk
+    param_list = [ round(elem, 2) for elem in param_list ]
 
-
-
-
-
-
-
-
-
+    return param_list
 
 

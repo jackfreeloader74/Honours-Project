@@ -35,6 +35,8 @@ def ShowPortfolio():
     Risk = request.args['Risk']
     Weights = request.args['weights']
     Tickers = request.args['tickers']
+    cash = request.args['cash']
+    share_volume_list = request.args['share_volume_list']
 
     Sharpe= round(float(Return)/float(Risk),2)
 
@@ -45,15 +47,21 @@ def ShowPortfolio():
     Weights = [ round(weight,2) for weight in Weights ]
 
     Tickers = ast.literal_eval(Tickers)
-    
+    print("after", share_volume_list)
+    share_volume_list = ast.literal_eval(share_volume_list)
 
-    ## REMEMBER CURRENTLY USING STATIC apple ticker
+    print("after", share_volume_list)
+
+  
     return render_template('portfolio_summary.html', name = 'Portfolio Weights',
                            Return = Return,
                            Sharpe = Sharpe,
                            Risk= Risk,
                            w1=Weights[0],w2=Weights[1],w3=Weights[2],w4=Weights[3],
                            t1=Tickers[0], t2=Tickers[1], t3=Tickers[2], t4=Tickers[3],
+                           cash=cash,
+                           sv1=share_volume_list[0],sv2=share_volume_list[1], sv3=share_volume_list[2],
+                           sv4=share_volume_list[3],
                            url_pie ='static/images/pie_chart.png',
                            url_efficient ='static/images/efficient_frontier.png')
 
@@ -78,13 +86,17 @@ def generatePortfolio():
         Checked = "off";
 
 
+
+
+
     # If they selected the checkbox, dont use the expected return value in opt code
     if Checked == "on":
         BestRatio = False;
 
 
     expected_return = request.form['expectedReturn']
-
+    cash = request.form['cash']
+    
     # Obtain tickers from user input
     _ticker1 = request.form['inputTicker1']
     _ticker2 = request.form['inputTicker2']
@@ -112,7 +124,7 @@ def generatePortfolio():
     # Perform Optimization 
     Return, weights, Risk = hp.OptimizePortfolio(tickers, expected_return, BestRatio)  
 
-
+ 
 
 
     # Check if any of the tickers entered by the user is invalid
@@ -123,18 +135,20 @@ def generatePortfolio():
         return redirect(url_for('.Invalid', message=message) )
         
     else:
+
+        share_volume_list = hp.CalculateShareVolume(tickers, weights, cash)
+        print( "SHARE SHARE ", share_volume_list)
+        
         weights = list(weights)        
         return redirect(url_for('.ShowPortfolio',
                                 Return=Return,
                                 Risk=Risk,
+                                cash=cash,
+                                share_volume_list=str(share_volume_list),
                                 weights=str(weights),
                                 tickers=str(tickers)) )
   
   
-
-
-
-
 
 
 @app.route('/ShowPDF')
