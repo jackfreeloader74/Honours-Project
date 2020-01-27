@@ -56,7 +56,7 @@
 				  <th scope="col">#</th>
 				  <th scope="col">Stock</th>
 				  <th scope="col">Weight (%)</th>
-				  <th scope="col">Share Count</th>
+				  <th scope="col">Share Count (£{{ cash }})</th>
 				</tr>
 			  </thead>
 			  <tbody>
@@ -91,8 +91,8 @@
 			
 
 			<img src={{ url_pie }} alt="Chart" height="300" width="300">	
-			<img src={{ url_efficient }} alt="Chart" height="300" width="300">	
-			<button id="exportToPdfBtn" class="btn btn-lg btn-primary btn-block">Export Portfolio to PDF</button>		 
+			<img src={{ url_efficient }} alt="Chart" height="300" width="300">
+					 
 		</div>
 	  
 	  
@@ -104,7 +104,11 @@
         <div class="row marketing">
             <div class="col-lg-6">
                 
-
+				<div>
+					<img src="static/images/portfolio_value_chart.png" alt="Chart" height="300" width="600">			
+				</div>
+				
+				<button id="exportToPdfBtn" class="btn btn-lg btn-primary btn-block">Export Portfolio to PDF</button>
             </div>
 			
 			
