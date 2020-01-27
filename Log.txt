@@ -194,8 +194,6 @@ Next thing to work on could be the graph highlighting past portfolio performance
 
 26th Jan 
 
-Did work on building a graph that demonstrates the total value of the portfolio in cash over time
-
 Ran into an interesting bug where the application does not work on a sunday? To get the amount of shares the user can purchase,
 it makes an api call to get the current value of the share on todays date. However this date fails if the day is a sunday, maybe due
 to the way stock markets work? Will need to provide a workaround, if today is a sunday, use a saturday instead. 
@@ -208,7 +206,15 @@ If its a sunday, use a saturday
 If the time is before 3pm, use the day before (unless the day before is a sunday)
 
 
+Added a new graph to the summary page that shows the portfolios value in cash over time. 
 
+Doing this made me think about how the value of this portfolio does not include dividends provided by the stock over time.
+A potentially new requirement could be to sum up the cash received in dividends over the same time period as the graph in order to show the extra income that would also be generated.
+
+Beyond this which could be way to difficult but it would be to include the idea of dividend reinvestment, 
+e.g. if you invested in these stocks, and reinvested all the dividends received in this time frame back into the same stocks, what would the graph of total portfolio value be?  I am pretty sure I can do just the simple dividend calculation but the reinvesment part is unclear.
+
+-------------------------------------------------------------------------------------------------------------------------------
 
 
 LIST OF PACKAGES REQUIRED TO RUN APPLICAITON
