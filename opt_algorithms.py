@@ -8,7 +8,7 @@ from dateutil.relativedelta import relativedelta
 url = "https://finance.yahoo.com/quote/{}/history"
 
 
-def OptimizePortfolio(tickers, user_expected_return, FindBestRatio):
+def OptimizePortfolio(tickers, user_expected_return, FindBestRatio, cash):
 
      
     stocks = [ tickers[0], tickers[1], tickers[2], tickers[3] ]
@@ -85,18 +85,32 @@ def OptimizePortfolio(tickers, user_expected_return, FindBestRatio):
                 BestReturn = portfolio_return
                 currentRisk = round(results[1,i],2)
 
-        
-    # Efficient frontier graph
+
+
+  
+    labels = tickers[0],tickers[1],tickers[2], tickers[3]
+
+    # Plot Graphs
     plot_efficient_chart( pd, results)
 
-    # Pie Chart
-    labels = tickers[0],tickers[1],tickers[2], tickers[3]
     plot_pie_chart(labels, BestWeights)
 
+    plot_line_chart(data, stocks, BestWeights, float(cash) )
   
     return BestReturn, BestWeights, currentRisk
 
 
+
+"""
+
+Use the stocks, weights, cash value and the current share value to calculate how
+many shares of each stock can be bought.
+
+
+User inputs cash in pounds but stock value is in USD. Need to convert currency
+
+"""
+from currency_converter import CurrencyConverter
 
 
 def CalculateShareVolume( tickers, weights, cash ):
@@ -107,38 +121,52 @@ def CalculateShareVolume( tickers, weights, cash ):
     
     for w in weights:
 
-        stock_cash_value = float(w) * float(cash)
+        stock_cash_value_pounds = float(w) * float(cash)
 
-        #print("Stock cash value", stock_cash_value)
-        share_volume = round(stock_cash_value / share_price( tickers[i]), 2)
-        #print("Share volume ", tickers[i], share_volume)
+        c = CurrencyConverter()
+
+        stock_cash_value_dollars = c.convert (stock_cash_value_pounds, 'GBP', 'USD')
+        
+        share_volume = round( stock_cash_value_dollars / share_price( tickers[i]), 2)
+       
         share_list.append(share_volume)
         i += 1
 
-
-    print("Share Volume list", share_list)
-                
-    
     return share_list
+
+
 
 
 def share_price( ticker ):
 
     one = dt.datetime.now()
-    date_formated = one.strftime("%d/%m/%Y")
 
+    open_time = dt.time(15, 0, 0 )
+    
+    # If its before 3pm, use the price from the day before
+    # If its a monday or monday use info from saturday
+
+    if one.time() < open_time:
+        if one.weekday() == 0:
+            one = one - timedelta(days=2)
+        else:
+            one = one - timedelta(days=1)
+
+    elif( one.weekday() == 7 ):
+        one = one - timedelta(days=1)
+
+    date_formated = one.strftime("%d/%m/%Y")
+    
     stocks = [ticker]
     
-    data = web.DataReader( stocks , data_source="yahoo", start=date_formated, end=date_formated)['Adj Close']
+    data = web.DataReader( stocks, data_source="yahoo", start=date_formated, end=date_formated)['Adj Close']
+   
+    print(data.head())
     data.sort_index(inplace=True)
 
-
-   
-    
     value = data.loc[data.index[0], ticker]
 
-
-
+    
     return value
 
 
@@ -166,11 +194,40 @@ def plot_pie_chart(labels, BestWeights):
 
 
 
+def plot_line_chart(data, tickers, weights, cash):
+
+    data['pct_1'] = data[tickers[0]].pct_change()
+    data['pct_2'] = data[tickers[1]].pct_change()
+    data['pct_3'] = data[tickers[2]].pct_change()
+    data['pct_4'] = data[tickers[3]].pct_change()
+
+    data['Value_1'] =  weights[0]*cash*(1+data['pct_1'])
+    data['Value_2'] =  weights[1]*cash*(1+data['pct_2'])
+    data['Value_3'] =  weights[2]*cash*(1+data['pct_3'])
+    data['Value_4'] =  weights[3]*cash*(1+data['pct_4'])
+
+    data['Total'] = data['Value_1'] + data['Value_2'] + data['Value_3'] + data['Value_4']
+    data = data.iloc[::50,:]
+
+
+    plt.cla()
+    plt.clf()
+    ax = data['Total'].plot(label='Portfolio',figsize=(16,8), title="Portfolio Performance")
+
+    ax.set_ylabel("Portfolio Value ($)")
+    
+    plt.savefig('static\\images\\portfolio_value_chart.png', bbox_inches='tight')
+
+
 
 def round_list(param_list):
     
     param_list = [ round(elem, 2) for elem in param_list ]
 
     return param_list
+
+
+
+
 
 

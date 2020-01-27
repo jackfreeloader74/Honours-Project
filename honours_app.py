@@ -36,6 +36,7 @@ def ShowPortfolio():
     Weights = request.args['weights']
     Tickers = request.args['tickers']
     cash = request.args['cash']
+    cash = "{:,.2f}".format(float(cash))
     share_volume_list = request.args['share_volume_list']
 
     Sharpe= round(float(Return)/float(Risk),2)
@@ -47,10 +48,11 @@ def ShowPortfolio():
     Weights = [ round(weight,2) for weight in Weights ]
 
     Tickers = ast.literal_eval(Tickers)
-    print("after", share_volume_list)
+
+ 
     share_volume_list = ast.literal_eval(share_volume_list)
 
-    print("after", share_volume_list)
+   
 
   
     return render_template('portfolio_summary.html', name = 'Portfolio Weights',
@@ -86,18 +88,20 @@ def generatePortfolio():
         Checked = "off";
 
 
-
-
-
     # If they selected the checkbox, dont use the expected return value in opt code
     if Checked == "on":
         BestRatio = False;
 
 
-    expected_return = request.form['expectedReturn']
+    
     cash = request.form['cash']
+    if(cash == "" ):
+        cash = 10000
+    
+    
     
     # Obtain tickers from user input
+    expected_return = request.form['expectedReturn']
     _ticker1 = request.form['inputTicker1']
     _ticker2 = request.form['inputTicker2']
     _ticker3 = request.form['inputTicker3']
@@ -120,13 +124,10 @@ def generatePortfolio():
         return redirect(url_for('.Invalid', message=message) )
     
     
-
     # Perform Optimization 
-    Return, weights, Risk = hp.OptimizePortfolio(tickers, expected_return, BestRatio)  
+    Return, weights, Risk = hp.OptimizePortfolio(tickers, expected_return, BestRatio, cash)  
 
  
-
-
     # Check if any of the tickers entered by the user is invalid
     if Return == False:
         
@@ -137,7 +138,7 @@ def generatePortfolio():
     else:
 
         share_volume_list = hp.CalculateShareVolume(tickers, weights, cash)
-        print( "SHARE SHARE ", share_volume_list)
+    
         
         weights = list(weights)        
         return redirect(url_for('.ShowPortfolio',
@@ -166,8 +167,6 @@ def generatePDF():
     expected_return = request.args.get('Return')
     risk = request.args.get('Risk')
 
-    print("Risk", float(risk))
-    print("ret", expected_return)
 
     Sharpe = round(float(expected_return)/float(risk),2)
     
