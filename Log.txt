@@ -216,6 +216,24 @@ e.g. if you invested in these stocks, and reinvested all the dividends received 
 
 -------------------------------------------------------------------------------------------------------------------------------
 
+Log for the 30th of Jan
+
+I have added a new input field on the home page for portfolio size (number of companies to invest in).
+Other changes to both client and server side means that the table on the summary screen that details weights and share count can 
+now be of dynamic lenght. E.g. Specify portfolio of 3 and the table will have have 3 rows.
+
+This will be the setup for the followign scenario:
+
+User inputs a size  of 4 but leaves 2 tickers blank. Application must select build a portfolio using the 2 provided tickers, and find  other stocks to meet the size requirement.
+
+Might need to make use of angular JS so that the value in the portfolio size input box will dynamically disable input boxes.
+
+E.g if you enter a size of 3, the application should blank and disable the 4th input box
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+
+
 
 LIST OF PACKAGES REQUIRED TO RUN APPLICAITON
 
