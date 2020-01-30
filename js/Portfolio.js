@@ -9,10 +9,17 @@ $(function() {
 function init()
 {
 	
+	
 	$("#expectedReturn").hide();
 	$("#expectedReturnLabel").hide();
 	$("#returnHelp").hide();
 	$("#expectedReturn").prop('required', false );
+	$("#cash").prop('required', false );
+	
+	$("#loader").hide();
+	
+	
+	
 	return true;
 };
 
@@ -50,7 +57,7 @@ function checkIfArrayContainsDuplicates(arr) {
 
 function validateForm() {
 	
-	//var ticker1 = $('#inputTicker1').val()
+	
 	var exp_return = document.forms["myForm"]["expectedReturn"].value;
 	
 	var t1 = document.forms["myForm"]["inputTicker1"].value;
@@ -60,11 +67,44 @@ function validateForm() {
 	
 	tickers = [t1, t2, t3, t4]
 	
+	var cash = document.forms["myForm"]["cash"].value;
+	
+	var portfolio_size = document.forms["myForm"]["portfolioSize"].value;
+	
+	if( portfolio_size == "" )	
+		portfolio_size == 4;
+	
+	
 	
 	
 	if( checkIfArrayContainsDuplicates(tickers) )
 	{
 		alert("Please do not include the same ticker more than once");
+		return false;
+	}
+	else if( isNaN(portfolio_size))
+	{
+		alert("Portfolio Size must be a number" );
+		return false;
+	}
+	else if( portfolio_size < 0 || portfolio_size > 4 )
+	{
+		alert( "Portfolio is an invalid size" );
+		return false;
+	}
+	else if( cash && isNaN(cash))
+	{
+		alert("Cash value must be a valid number");
+		return false;
+	}
+	else if( cash < 100 )
+	{
+		alert( "Cash value must be greater than 100." );
+		return false;
+	}
+	else if(isNaN(exp_return) )
+	{
+		alert("Minumum expected return must be a number.");
 		return false;
 	}
 	else if( exp_return < 0 )
@@ -78,7 +118,10 @@ function validateForm() {
 		return false;
 	}
 	else
+	{		
+		//$("#loader").show();	
 		return true;
+	}
 }
 
 
@@ -86,12 +129,16 @@ $(function() {
 	
 	$('#checkBox').click(function() {
 		
-		if(  $("#checkBox").is(":checked") ){
+		if( $("#checkBox").is(":checked") ){
 			$("#expectedReturn").show();
 			$("#expectedReturnLabel").show();
 			$("#returnHelp").show();
 			
-			//$("#expectedReturn").prop('required', true );
+			
+			$("#checkBoxLabel").text("Find best risk-reward ratio ");
+			
+			
+			$("#expectedReturn").prop('required', true );
 		}
 		else
 		{
@@ -100,6 +147,7 @@ $(function() {
 			$("#returnHelp").hide();
 			$("#expectedReturn").val("")
 			$("#expectedReturn").prop('required', false );
+			$("#checkBoxLabel").text("Specify Minimum Return");
 		}
 			
 	});
@@ -114,10 +162,19 @@ $(function() {
 		
 		$("#inputTicker1").val("AAPL");
 		$("#inputTicker2").val("AMZN");
-		$("#inputTicker3").val("TLSA");
+		$("#inputTicker3").val("TSLA");
 		$("#inputTicker4").val("XOM");
+		$("#cash").val("10000");
 	});
 });
+
+
+
+
+
+
+
+
 
 
 
