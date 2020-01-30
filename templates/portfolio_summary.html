@@ -40,16 +40,13 @@
 				<tbody>
 					<tr>
 						
-							<td id="return">{{ Return }}</td>
-							<td id="risk">{{ Risk }}</td>
-							<td id="sharpe">{{ Sharpe }}</td>
+						<td id="return">{{ Return }}</td>
+						<td id="risk">{{ Risk }}</td>
+						<td id="sharpe">{{ Sharpe }}</td>
 					</tr>
 				</tbody>
 			</table>
-		
-	
-		
-		
+				
 			<table class="table table">
 			  <thead>
 				<tr>
@@ -60,66 +57,53 @@
 				</tr>
 			  </thead>
 			  <tbody>
-				<tr>
-				  <th scope="row">1</th>
-				  <td id="t1">{{ t1 }}</td>
-				  <td id="w1">{{ w1 }}</td>
-				  <td id="sv1">{{ sv1 }}</td>
-				</tr>
-				<tr>
-				  <th scope="row">2</th>
-				  <td id="t2">{{ t2 }}</td>
-				  <td id="w2">{{ w2 }}</td>
-				  <td id="sv2">{{ sv2 }}</td>
-				</tr>
-				<tr>
-				  <th scope="row">3</th>
-				  <td id="t3">{{ t3 }}</td>
-				  <td id="w3">{{ w3 }}</td>	
-				  <td id="sv3">{{ sv3 }}</td>
-				</tr>
-				<tr>
-				  <th scope="row">4</th>
-				  <td id="t4">{{ t4 }}</td>
-				  <td id="w4">{{ w4 }}</td>	
-				  <td id="sv4">{{ sv4 }}</td>
-				</tr>
+				{{ table | safe }}
 			  </tbody>
 			</table>
-		  
-	  
+		
+			<div class="col-lg-12">
+				
+				<div class="gallery" id="gallery">
+				
+					<img src={{ url_pie }} height="200" width="200"/>
+					
+					<img class="middle-img" src={{ url_efficient }} height="200" width="200"/>
+				</div>
+			</div>
+		</div>
 			
 
-			<img src={{ url_pie }} alt="Chart" height="300" width="300">	
-			<img src={{ url_efficient }} alt="Chart" height="300" width="300">
-					 
+		<div class="image123">
+				
+				
+				
+				<div class="imgContainer">
+					 <img src="static/images/portfolio_value_chart.png"/ height="400" width="600"/>
+				</div>
+			</div>	
+
 		</div>
 	  
-	  
-	  
-	  
-	  
-	  
- 
+
+
         <div class="row marketing">
             <div class="col-lg-6">
-                
-				<div>
-					<img src="static/images/portfolio_value_chart.png" alt="Chart" height="300" width="600">			
-				</div>
+               
+			
+		
+			</div>
 				
-				<button id="exportToPdfBtn" class="btn btn-lg btn-primary btn-block">Export Portfolio to PDF</button>
-            </div>
 			
+		
+								
 			
-			
-			
-            <div class="col-lg-6">
-             
-            </div>
         </div>
  
         <footer class="footer">
+			
+			</div class="pdf_btn">
+				<button id="exportToPdfBtn" class="btn btn-lg btn-primary btn-block">Export Portfolio to PDF</button>
+			<div>
           
         </footer>
  

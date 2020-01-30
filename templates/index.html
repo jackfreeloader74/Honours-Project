@@ -6,7 +6,8 @@
  
 	<link href="static\portfolio.css" rel="stylesheet">
 	<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
-    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	
 	<script src="../static/js/jquery-1.11.2.js"></script>
     <script src="../static/js/Portfolio.js"></script>
 </head>
@@ -16,26 +17,30 @@
     <div class="container">
         <div class="header">
             <nav>
-                <ul class="nav nav-pills pull-right">
-                   
-              
-                </ul>
-				
-				<h3 class="text-muted"></h3>
-            </nav>
-            
+                <ul class="nav nav-pills pull-right"></ul>			
+            </nav>          
         </div>
  
-        <div id="load_icon" class="jumbotron">
+ 
+		
+			
+ 
+        <div id="main" class="jumbotron">
 			<h3 id="title" class="text-muted">Portfolio Optimization App</h3>
             <h4>{{ message }}</h4>
             <p class="lead"></p>
 			
-		
 			
 			
-						
-			<form name="myForm" action="/generatePortfolio" onsubmit="return validateForm()" method="post">
+			<div class="loader" id="loader"></div>
+			
+			
+			
+			<!-- Section for showing Google Map. Empty for the moment. It will be populated by JS. -->
+								
+			<form name="myForm" id="theForm" action="/generatePortfolio" onsubmit="return validateForm()" method="post">
+				
+				<label id="checkBoxLabel" for="checkBox">Specify Minimum Return</label>
 				
 				<label class="switch">
 					<input type="checkbox" for="checkBox" id="checkBox" name="checkBox">
@@ -50,6 +55,13 @@
 					<small id="returnHelp" class="form-text text-muted">Enter the minimum rate of return for your desired portfolio.</small>
 				</div>
 				
+				<div class="form-group">
+					<label id="portfolioSizeLabel" for="expectedReturn">Portfolio Size</label>
+					<input type="name" name="portfolioSize" required="false" id="portfolioSize" class="form-control" placeholder="Portfolio Size" required="false">
+					<small id="returnHelp" class="form-text text-muted">Enter the number of companies you wish to invest in</small>
+				</div>
+				
+				
 					<input type="name" name="inputTicker1" id="inputTicker1" class="form-control" placeholder="Stock Ticker 1" required autofocus>
 					<label for="inputTicker2" class="sr-only"></label>
 					
@@ -62,7 +74,17 @@
 					<input type="name" name="inputTicker4" id="inputTicker4" class="form-control" placeholder="Stock Ticker 4" required>
 					<small id="emailHelp" class="form-text text-muted">Enter the stocks that you want to have in your portfolio in ticker form. E.g. Amazon = AMZN.</small>
 					
-					<button id="generatePortfolioBtn" class="btn btn-lg btn-primary btn-block" type="submit">Generate Portfolio</button>
+					
+					<div class="cash-group">
+						<input type="name" name="cash"  id="cash" class="form-control" placeholder="Cash Investment (£) (Optional)" required="false">
+					</div>
+					
+					
+					
+					<button id="generatePortfolioBtn" data-target="#myModal" class="btn btn-lg btn-primary btn-block" type="submit">
+					Generate Portfolio</button>
+					
+					
 			</form>
 			
 			<small id="emailHelp" class="form-text text-muted">WARNING: The creator of this tool is not a professional in the finance industry and you should therefore take any information
@@ -81,12 +103,12 @@
             </div>
  
             <div class="col-lg-6">
-                <button id="preset" class="btn btn-lg">Use Preset</button>
+                
             </div>
         </div>
  
         <footer class="footer">
-           
+           <button id="preset" class="btn btn-lg">Use Preset</button>
         </footer>
  
     </div>
