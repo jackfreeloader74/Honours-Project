@@ -232,6 +232,16 @@ E.g if you enter a size of 3, the application should blank and disable the 4th i
 
 -------------------------------------------------------------------------------------------------------------------------------
 
+User is informed of the sharpe ratio but could be worth telling them what that means? Maybe have some sort of number line type image
+that shows how good the sharpe ratio is:
+
+A Sharpe ratio of 1.0 is considered acceptable.
+A Sharpe ratio of 2.0 is considered very good.
+A Sharpe ratio of 3.0 is considered excellent.
+A Sharpe ratio of less than 1.0 is considered to be poor. 
+
+
+
 
 
 
