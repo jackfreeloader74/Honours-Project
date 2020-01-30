@@ -4,6 +4,8 @@ import pandas_datareader.data as web
 import datetime as dt
 import matplotlib.pyplot as plt
 from dateutil.relativedelta import relativedelta
+from datetime import timedelta
+
 
 url = "https://finance.yahoo.com/quote/{}/history"
 
@@ -11,7 +13,8 @@ url = "https://finance.yahoo.com/quote/{}/history"
 def OptimizePortfolio(tickers, user_expected_return, FindBestRatio, cash):
 
      
-    stocks = [ tickers[0], tickers[1], tickers[2], tickers[3] ]
+    #stocks = [ tickers[0], tickers[1], tickers[2], tickers[3] ]
+    stocks = tickers
     stocks = sorted(stocks)
     
 
@@ -47,8 +50,11 @@ def OptimizePortfolio(tickers, user_expected_return, FindBestRatio, cash):
 
     for i in range(num_portfolios):
 
+
+        
+    
         #select random weights for portfolio assets
-        weights = np.random.random(4) 
+        weights = np.random.random(len(stocks)) 
         weights /= np.sum(weights)
 
         # anualised portfolio return
@@ -86,9 +92,12 @@ def OptimizePortfolio(tickers, user_expected_return, FindBestRatio, cash):
                 currentRisk = round(results[1,i],2)
 
 
+    labels = []
 
+    for item in stocks:
+        labels.append( item )
   
-    labels = tickers[0],tickers[1],tickers[2], tickers[3]
+    #labels = tickers[0],tickers[1],tickers[2], tickers[3]
 
     # Plot Graphs
     plot_efficient_chart( pd, results)
@@ -152,19 +161,23 @@ def share_price( ticker ):
         else:
             one = one - timedelta(days=1)
 
-    elif( one.weekday() == 7 ):
+    elif( one.weekday() == 6 ):
         one = one - timedelta(days=1)
 
+    
     date_formated = one.strftime("%d/%m/%Y")
+   
     
     stocks = [ticker]
     
     data = web.DataReader( stocks, data_source="yahoo", start=date_formated, end=date_formated)['Adj Close']
-   
-    print(data.head())
+
     data.sort_index(inplace=True)
 
-    value = data.loc[data.index[0], ticker]
+    
+
+
+    value = data[ticker].iloc[0]
 
     
     return value
@@ -194,21 +207,30 @@ def plot_pie_chart(labels, BestWeights):
 
 
 
+""" Warning, this function severely alters the data frame so
+any more graphs and logic that involve the df should be done before this function call
+"""
+
 def plot_line_chart(data, tickers, weights, cash):
 
-    data['pct_1'] = data[tickers[0]].pct_change()
-    data['pct_2'] = data[tickers[1]].pct_change()
-    data['pct_3'] = data[tickers[2]].pct_change()
-    data['pct_4'] = data[tickers[3]].pct_change()
+ 
+    i = 0
 
-    data['Value_1'] =  weights[0]*cash*(1+data['pct_1'])
-    data['Value_2'] =  weights[1]*cash*(1+data['pct_2'])
-    data['Value_3'] =  weights[2]*cash*(1+data['pct_3'])
-    data['Value_4'] =  weights[3]*cash*(1+data['pct_4'])
+    data['Total'] = data[tickers[0]]
 
-    data['Total'] = data['Value_1'] + data['Value_2'] + data['Value_3'] + data['Value_4']
+    print( "Weights", weights )
+    print( "Tick ", tickers )
+
+    for tick in tickers:
+        data[tick] = data[tick].pct_change()
+
+        data['Total'] = data['Total'] + ( weights[i]*cash*(1+data[tick]) )
+
+        i += 1
+        
+
+    # Only record every 50 rows for graph
     data = data.iloc[::50,:]
-
 
     plt.cla()
     plt.clf()

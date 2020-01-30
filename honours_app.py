@@ -53,9 +53,9 @@ def ShowPortfolio():
     share_volume_list = ast.literal_eval(share_volume_list)
 
    
-
+    table = render_table( Tickers, Weights, share_volume_list)
   
-    return render_template('portfolio_summary.html', name = 'Portfolio Weights',
+    """return render_template('portfolio_summary.html', name = 'Portfolio Weights',
                            Return = Return,
                            Sharpe = Sharpe,
                            Risk= Risk,
@@ -66,7 +66,16 @@ def ShowPortfolio():
                            sv4=share_volume_list[3],
                            url_pie ='static/images/pie_chart.png',
                            url_efficient ='static/images/efficient_frontier.png')
+    """
 
+    return render_template('portfolio_summary.html', name = 'Portfolio Weights',
+                           Return = Return,
+                           Sharpe = Sharpe,
+                           Risk= Risk,
+                           table=table,
+                           cash=cash,    
+                           url_pie ='static/images/pie_chart.png',
+                           url_efficient ='static/images/efficient_frontier.png')
 
 
 
@@ -106,10 +115,13 @@ def generatePortfolio():
     _ticker2 = request.form['inputTicker2']
     _ticker3 = request.form['inputTicker3']
     _ticker4 = request.form['inputTicker4']
+    portfolio_size = request.form['portfolioSize']
 
+ 
     
     # Transorm tickers to appropriate format (Sort + Capitalize)
     tickers = [_ticker1,_ticker2, _ticker3, _ticker4 ]
+    tickers = filter_tickers( tickers, portfolio_size )
     tickers = [ element.upper() for element in tickers ]
     tickers = sorted(tickers)
 
@@ -179,6 +191,9 @@ def generatePDF():
     weights = ast.literal_eval(weights);
 
 
+   
+
+    
     # Render html file with all required data
     rendered = render_template('portfolio_pdf.html',
                                Return=expected_return,
@@ -200,7 +215,21 @@ def generatePDF():
     return "PDF Generated successfully"
     
 
+def render_table( tickers, weights, share_count ):
 
+    i = 0
+    html = ""
+    
+    for tick in tickers:
+
+        html = html + '<tr> <th scope=\"row\">{}</th> <td id=\"t1\">{}</td> <td id=\"w1\">{}</td> <td id=\"sv1\">{}</td> </tr>'.format(i+1, tick, weights[i], share_count[i] )
+        i += 1
+
+
+    print( html )
+
+
+    return html
 
 
 def invalid_return(expected_return):
@@ -214,6 +243,15 @@ def invalid_return(expected_return):
 
 
 
+def filter_tickers( tickers, size ):
+
+    print( "TICKER", tickers )
+    
+    tickers = tickers[:int(size)]
+
+    print( "TICKER", tickers )
+       
+    return tickers    
 
 
 
