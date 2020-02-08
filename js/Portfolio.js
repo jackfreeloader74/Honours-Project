@@ -8,20 +8,27 @@ $(function() {
 
 function init()
 {
-	
-	
+		
 	$("#expectedReturn").hide();
 	$("#expectedReturnLabel").hide();
 	$("#returnHelp").hide();
 	$("#expectedReturn").prop('required', false );
 	$("#cash").prop('required', false );
 	
-	$("#loader").hide();
+	//$("#loader").hide();
 	
 	
+	$("#appointmentEditDialog").dialog({	modal:true,			//modal dialog to disable parent when dialog is active
+	autoOpen:false,		//set autoOpen to false, hidding dialog after creation
+	title: "Edit Appointment",	//set title of dialog box
+	minWidth: 500,
+	minHeight: 400
+	});
 	
+
 	return true;
 };
+
 
 
 
@@ -160,22 +167,23 @@ $(function() {
 	
 	$("#preset").click(function() {
 		
+		$("#portfolioSize").val("4");
 		$("#inputTicker1").val("AAPL");
 		$("#inputTicker2").val("AMZN");
 		$("#inputTicker3").val("TSLA");
 		$("#inputTicker4").val("XOM");
 		$("#cash").val("10000");
+		
+		$("#appointmentEditDialog").dialog("open",true);
 	});
 });
 
 
-
-
-
-
-
-
-
+$(function() {
+	$("#ticker-search1").click(function() {
+		
+	});
+});
 
 
 $(function() {
@@ -203,13 +211,17 @@ $(function() {
 		weights = [w1, w2, w3, w4]	
 		weights = JSON.stringify(weights);
 		
+		var table = $("#myTable").html()
 	
+		//console.log("Row" + rowData)
+		
 		/* Add them as parameters to request */
 		var data = {
 			Return: exp_return,
 			Risk: risk,
 			Tickers: tickers,
-			Weights: weights
+			Weights: weights,
+			table: table
 		}
 		
 		
