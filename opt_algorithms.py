@@ -161,11 +161,16 @@ def share_price( ticker ):
         else:
             one = one - timedelta(days=1)
 
-    elif( one.weekday() == 6 ):
+    elif( one.weekday() == 5 ):
         one = one - timedelta(days=1)
 
+    elif( one.weekday() == 6 ):
+        one = one = timedelta(days=2)
+
     
-    date_formated = one.strftime("%d/%m/%Y")
+    date_formated = one.strftime("%m/%d/%Y")
+
+   
    
     
     stocks = [ticker]
@@ -179,6 +184,7 @@ def share_price( ticker ):
 
     value = data[ticker].iloc[0]
 
+   
     
     return value
 
@@ -218,8 +224,7 @@ def plot_line_chart(data, tickers, weights, cash):
 
     data['Total'] = data[tickers[0]]
 
-    print( "Weights", weights )
-    print( "Tick ", tickers )
+   
 
     for tick in tickers:
         data[tick] = data[tick].pct_change()

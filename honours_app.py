@@ -53,7 +53,7 @@ def ShowPortfolio():
     share_volume_list = ast.literal_eval(share_volume_list)
 
    
-    table = render_table( Tickers, Weights, share_volume_list)
+    table = render_table( Tickers, Weights, share_volume_list, cash)
   
     """return render_template('portfolio_summary.html', name = 'Portfolio Weights',
                            Return = Return,
@@ -178,8 +178,10 @@ def generatePDF():
     # Grab parameters from get request
     expected_return = request.args.get('Return')
     risk = request.args.get('Risk')
+    table = request.args.get('table')
 
 
+    #print( "Row Data", rowData)
     Sharpe = round(float(expected_return)/float(risk),2)
     
     tickers = request.args.get('Tickers')
@@ -201,8 +203,8 @@ def generatePDF():
                                Sharpe=Sharpe,
                                url_pie='C:/Users/marc.smith/AppData/Local/Programs/Python/Python37-32/static/images/pie_chart.png',
                                url_efficient='C:/Users/marc.smith/AppData/Local/Programs/Python/Python37-32/static/images/efficient_frontier.png',
-                               t1=tickers[0], t2=tickers[1], t3=tickers[2], t4=tickers[3],
-                               w1=weights[0],w2=weights[1],w3=weights[2],w4=weights[3])
+                               url_performance='C:/Users/marc.smith/AppData/Local/Programs/Python/Python37-32/static/images/portfolio_value_chart.png',
+                               table=table)
 
 
 
@@ -215,20 +217,21 @@ def generatePDF():
     return "PDF Generated successfully"
     
 
-def render_table( tickers, weights, share_count ):
+def render_table( tickers, weights, share_count, cash ):
 
     i = 0
-    html = ""
-    
+
+   
+    html = "<table class=\"table table\"><thead><tr><th scope=\"col\">#</th><th scope=\"col\">Stock</th><th scope=\"col\">Weight (%)</th><th scope=\"col\">Share Count (£{})</th></tr></thead><tbody>".format(cash)   
+
     for tick in tickers:
 
         html = html + '<tr> <th scope=\"row\">{}</th> <td id=\"t1\">{}</td> <td id=\"w1\">{}</td> <td id=\"sv1\">{}</td> </tr>'.format(i+1, tick, weights[i], share_count[i] )
         i += 1
 
 
-    print( html )
-
-
+    html = html + "</tbody></table>"
+				
     return html
 
 
