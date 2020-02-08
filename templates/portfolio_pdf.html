@@ -9,7 +9,7 @@
 </head>
  
 <body>
-	
+	<meta charset="UTF-8"/>
  
   <div class="container">
         <div class="header">
@@ -41,37 +41,8 @@
 			</table>
 		
 		
-			<table class="table table">
-			  <thead>
-				<tr>
-				  <th scope="col">#</th>
-				  <th scope="col">Stock</th>
-				  <th scope="col">Weight (%)</th>
-				</tr>
-			  </thead>
-			  <tbody>
-				<tr>
-				  <th scope="row">1</th>
-				  <td id="t1">{{ t1 }}</td>
-				  <td id="w1">{{ w1 }}</td>
-				</tr>
-				<tr>
-				  <th scope="row">2</th>
-				  <td id="t2">{{ t2 }}</td>
-				  <td id="w2">{{ w2 }}</td>
-				</tr>
-				<tr>
-				  <th scope="row">3</th>
-				  <td id="t3">{{ t3 }}</td>
-				  <td id="w3">{{ w3 }}</td>	
-				</tr>
-				<tr>
-				  <th scope="row">4</th>
-				  <td id="t4">{{ t4 }}</td>
-				  <td id="w4">{{ w4 }}</td>	
-				</tr>
-			  </tbody>
-			</table>
+			{{ table | safe }}
+			
 		  		
 			
 			<img src={{ url_pie }} alt="Chart" height="300" width="300">	
@@ -84,6 +55,11 @@
         <div class="row marketing">
             <div class="col-lg-6">
            
+		
+				<img src={{ url_performance }} alt="Chart" height="400" width="600">
+				
+		   
+		   
             </div>
 			
 			

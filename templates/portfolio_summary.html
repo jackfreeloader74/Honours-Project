@@ -46,21 +46,13 @@
 					</tr>
 				</tbody>
 			</table>
+			
+			<div id="myTable">			
 				
-			<table class="table table">
-			  <thead>
-				<tr>
-				  <th scope="col">#</th>
-				  <th scope="col">Stock</th>
-				  <th scope="col">Weight (%)</th>
-				  <th scope="col">Share Count (£{{ cash }})</th>
-				</tr>
-			  </thead>
-			  <tbody>
+				
 				{{ table | safe }}
-			  </tbody>
-			</table>
-		
+					
+			</div>
 			<div class="col-lg-12">
 				
 				<div class="gallery" id="gallery">
@@ -82,15 +74,17 @@
 				</div>
 			</div>	
 
+		<div class="col-lg-6">
+			</div class="pdf_btn">
+				<button id="exportToPdfBtn" class="btn btn-lg btn-primary btn-block">Export Portfolio to PDF</button>
+			<div>
+
 		</div>
 	  
 
 
         <div class="row marketing">
-            <div class="col-lg-6">
-               
-			
-		
+            
 			</div>
 				
 			
@@ -101,9 +95,7 @@
  
         <footer class="footer">
 			
-			</div class="pdf_btn">
-				<button id="exportToPdfBtn" class="btn btn-lg btn-primary btn-block">Export Portfolio to PDF</button>
-			<div>
+			
           
         </footer>
  
