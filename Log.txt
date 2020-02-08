@@ -242,6 +242,18 @@ A Sharpe ratio of less than 1.0 is considered to be poor.
 
 
 
+-------------------------------------------------------------------------------------------------------------------------------
+08/02/20120
+
+Alot of the new changes to the portfolio summary page like the new table as well as the dynamic sizing of the existing table needed to be copied over onto the generated PDF. This has now been done. Only issue i found was PDF kit was displaying currency symbols (£) in a weird way. Fix for this was to add to the html page "<meta charset="UTF-8"/>
+
+2 Biggest priorities:
+ 
+Design and implement a way of displaying to users the top 100 public traded companies along with their corresponding ticker.
+
+API Backup - Write data from a yahoo finance API call into a csv, then add an option to use that as the data to generate the portfolio from instead of the API call
+
+-------------------------------------------------------------------------------------------------------------------------------
 
 
 
