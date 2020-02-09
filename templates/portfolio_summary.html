@@ -3,7 +3,8 @@
  
 <head>
     <title>Portfolio Optimization Tool</title>
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+	
+	<!--<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
 	<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 	<script src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
 	
@@ -11,17 +12,56 @@
 	<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
 	<!--<script src="../static/js/jquery-1.11.2.js"></script> -->
 	<script src="../static/js/Portfolio.js"></script>
+	
+	
+	<link href="../static/navbar.css" rel="stylesheet">
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+
+   	
+	<script src="../static/js/jquery-1.11.2.js"></script>
+    <script src="../static/js/Portfolio.js"></script>
+	<script src = "https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+	<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+	
+	
+	
+	
+	
 </head>
  
 <body>
  
+ 
+	<nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <p class="navbar-brand">Portfolio Optimization Tool</p>
+        </div>
+        <div class="collapse navbar-collapse">
+          <ul class="nav navbar-nav pull-right">
+            <li><a href=".">Home</a></li>
+			<li class="active"><a href="#">Summary</a></li>
+            <li><a href="about">About</a></li>
+           
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+ 
+	
+ 
+ 
+ 
+ 
     <div class="container">
         <div class="header">
             <nav>
-                <ul class="nav nav-pills pull-right">
-                    <li role="presentation" class="active"><a href="/">Home</a>                                  
-                    </li>
-                </ul>
+               
             </nav>
             <h3 id="testID" class="text-muted">Portfolio Summary</h3>
         </div>
@@ -55,37 +95,48 @@
 			</div>
 			<div class="col-lg-12">
 				
-				<div class="gallery" id="gallery">
 				
-					<img src={{ url_pie }} height="200" width="200"/>
-					
-					<img class="middle-img" src={{ url_efficient }} height="200" width="200"/>
-				</div>
 			</div>
+		
+		
+		
+		
+		<div class="input-group">
+			
+			<img src={{ url_pie }} height="300" width="300"/>
+					
+				<span  style="visibility: hidden;"  class="input-group-addon"></span>
+						
+				<div style="padding-left: 10px;">
+					<img class="middle-img" src={{ url_efficient }} height="300" width="300"/>
+				</div>
 		</div>
+		
+		
+		
+		
+		
 			
 
-		<div class="image123">
+		<div class="input-group">
 				
-				
-				
-				<div class="imgContainer">
-					 <img src="static/images/portfolio_value_chart.png"/ height="400" width="600"/>
-				</div>
-			</div>	
+			<div>
+				<img src="static/images/portfolio_value_chart.png"/ height="400" width="600"/>
+			</div>
+		</div>	
 
 		<div class="col-lg-6">
-			</div class="pdf_btn">
+			<div class="pdf_btn">
 				<button id="exportToPdfBtn" class="btn btn-lg btn-primary btn-block">Export Portfolio to PDF</button>
-			<div>
+			</div>
 
 		</div>
 	  
 
 
-        <div class="row marketing">
-            
-			</div>
+		<div class="row marketing">
+				
+		</div>
 				
 			
 		
