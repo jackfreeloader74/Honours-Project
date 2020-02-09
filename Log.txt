@@ -135,12 +135,6 @@ Had meeting with david + discussions over email
  
  
  
- 
- 
- 
- 
- 
- 
 
 
 18th Jan -------------------------------------------------------------------------------------------------------------------------------
@@ -255,7 +249,25 @@ API Backup - Write data from a yahoo finance API call into a csv, then add an op
 
 -------------------------------------------------------------------------------------------------------------------------------
 
+09/02/20120
 
+I have added a new popup to the main page that displays a list of publically traded companies and their corresponding ticker
+
+I have added option in the code so that the financial data will be read from an already saved csv file. This is what will be used as the backup incase yahoo API goes down.
+
+I have updated the web pages to have a nicer looking navigation bar. Also added a new "About" page which provides the user with the theory behind the optimization methods that the applicaiton uses to generate portfolios.
+
+4 more stock input boxes have been added to the index page (Allowing for a maximum portfolio size of 8)
+
+Current priorities:
+
+  Complete the auto selection of stocks (E.g. user selects portfolio size of 8 but only inputs 4 stocks, app must select another 4 on
+  behalf of the user).
+
+  Fix the current bug where the weights sometimes dont add up to 100%
+
+
+-------------------------------------------------------------------------------------------------------------------------------
 
 LIST OF PACKAGES REQUIRED TO RUN APPLICAITON
 
