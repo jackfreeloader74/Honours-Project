@@ -15,6 +15,9 @@ function init()
 	$("#expectedReturn").prop('required', false );
 	$("#cash").prop('required', false );
 	
+	//$("#span1").hide();
+	//$("#span1").hide()
+	
 	//$("#loader").hide();
 	
 	
@@ -25,6 +28,9 @@ function init()
 	minHeight: 400
 	});
 	
+
+
+
 
 	return true;
 };
@@ -94,7 +100,7 @@ function validateForm() {
 		alert("Portfolio Size must be a number" );
 		return false;
 	}
-	else if( portfolio_size < 0 || portfolio_size > 4 )
+	else if( portfolio_size < 0 || portfolio_size > 8 )
 	{
 		alert( "Portfolio is an invalid size" );
 		return false;
@@ -142,7 +148,7 @@ $(function() {
 			$("#returnHelp").show();
 			
 			
-			$("#checkBoxLabel").text("Find best risk-reward ratio ");
+			//$("#checkBoxLabel").text("Find best risk-reward ratio ");
 			
 			
 			$("#expectedReturn").prop('required', true );
@@ -154,7 +160,7 @@ $(function() {
 			$("#returnHelp").hide();
 			$("#expectedReturn").val("")
 			$("#expectedReturn").prop('required', false );
-			$("#checkBoxLabel").text("Specify Minimum Return");
+			//$("#checkBoxLabel").text("Specify Minimum Return");
 		}
 			
 	});
@@ -162,16 +168,31 @@ $(function() {
 });
 
 
+$(function() {
+	$("#view_ticker_btn").click(function() {
+		
+		$(document).ready(function() {
+			$("#MyModal").modal();
+		});
+	});
+	
+});
+
+ 
 
 $(function() {
 	
 	$("#preset").click(function() {
 		
-		$("#portfolioSize").val("4");
+		$("#portfolioSize").val("8");
 		$("#inputTicker1").val("AAPL");
 		$("#inputTicker2").val("AMZN");
 		$("#inputTicker3").val("TSLA");
 		$("#inputTicker4").val("XOM");
+		$("#inputTicker5").val("GOOG");
+		$("#inputTicker6").val("SBUX");
+		$("#inputTicker7").val("IBM");
+		$("#inputTicker8").val("MSFT");
 		$("#cash").val("10000");
 		
 		$("#appointmentEditDialog").dialog("open",true);
