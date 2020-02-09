@@ -26,6 +26,9 @@ def Invalid():
     message = request.args['message']
     return render_template('index.html', message=message)
 
+@app.route("/about")
+def about():
+    return render_template('about.html')
 
 
 @app.route('/ShowPortfolio')
@@ -115,12 +118,17 @@ def generatePortfolio():
     _ticker2 = request.form['inputTicker2']
     _ticker3 = request.form['inputTicker3']
     _ticker4 = request.form['inputTicker4']
+    _ticker5 = request.form['inputTicker5']
+    _ticker6 = request.form['inputTicker6']
+    _ticker7 = request.form['inputTicker7']
+    _ticker8 = request.form['inputTicker8']
     portfolio_size = request.form['portfolioSize']
 
  
     
     # Transorm tickers to appropriate format (Sort + Capitalize)
-    tickers = [_ticker1,_ticker2, _ticker3, _ticker4 ]
+    tickers = [_ticker1,_ticker2, _ticker3, _ticker4, _ticker5
+               , _ticker6, _ticker7, _ticker8]
     tickers = filter_tickers( tickers, portfolio_size )
     tickers = [ element.upper() for element in tickers ]
     tickers = sorted(tickers)

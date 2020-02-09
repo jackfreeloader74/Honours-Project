@@ -10,6 +10,9 @@ from datetime import timedelta
 url = "https://finance.yahoo.com/quote/{}/history"
 
 
+yahoo_up = True
+
+
 def OptimizePortfolio(tickers, user_expected_return, FindBestRatio, cash):
 
      
@@ -18,11 +21,18 @@ def OptimizePortfolio(tickers, user_expected_return, FindBestRatio, cash):
     stocks = sorted(stocks)
     
 
-    data = web.DataReader( stocks, data_source="yahoo", start='01/01/2010', end='01/01/2020')['Adj Close']
-    data.sort_index(inplace=True)
+    if yahoo_up:
+        data = web.DataReader( stocks, data_source="yahoo", start='01/01/2010', end='01/01/2020')['Adj Close']
+        data.sort_index(inplace=True)
+    else:
+        data = pd.read_csv('stocks.csv')
+        data.sort_index(inplace=True)
+        print( data.columns[0])
+        data = data.drop(columns=['Date'])
+       
+    
 
     # Validate user provided tickers
-
     for ticker in stocks:
         if data[ticker].isnull().all():
             return False, ticker, None
@@ -165,7 +175,7 @@ def share_price( ticker ):
         one = one - timedelta(days=1)
 
     elif( one.weekday() == 6 ):
-        one = one = timedelta(days=2)
+        one = one - timedelta(days=2)
 
     
     date_formated = one.strftime("%m/%d/%Y")
@@ -204,7 +214,7 @@ def plot_pie_chart(labels, BestWeights):
     plt.clf()
     
     fig1, ax1 = plt.subplots()
-    colors = ['yellowgreen', 'gold', 'lightskyblue', 'lightcoral']
+    colors = ['yellowgreen', 'gold', 'lightskyblue', 'lightcoral', 'm', 'k', 'c', 'r']
     patches, texts = plt.pie(BestWeights, colors=colors, startangle=90)
     plt.legend(patches, labels, loc="best")
     ax1.axis('equal')
