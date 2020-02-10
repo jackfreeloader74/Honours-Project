@@ -41,6 +41,7 @@ def ShowPortfolio():
     cash = request.args['cash']
     cash = "{:,.2f}".format(float(cash))
     share_volume_list = request.args['share_volume_list']
+    sectors = request.args['sectors']
 
     Sharpe= round(float(Return)/float(Risk),2)
 
@@ -50,13 +51,13 @@ def ShowPortfolio():
     # Round weights to 2 dec places, maybe should do this in OPT code?
     Weights = [ round(weight,3) for weight in Weights ]
 
-    Tickers = ast.literal_eval(Tickers)
 
- 
+    Tickers = ast.literal_eval(Tickers)
+    sectors = ast.literal_eval(sectors)
     share_volume_list = ast.literal_eval(share_volume_list)
 
-   
-    table = render_table( Tickers, Weights, share_volume_list, cash)
+    # Table on summary page is of dynamic length so we create the html here
+    table = render_table( Tickers, Weights, share_volume_list, cash, sectors)
   
    
     return render_template('portfolio_summary.html', name = 'Portfolio Weights',
@@ -119,7 +120,7 @@ def generatePortfolio():
     tickers = [ element.upper() for element in tickers ]
     tickers = sorted(tickers)
 
-    print( "LIST2 ", tickers)
+    
     
     """if tickers_contain_duplicates(tickers):
         # Duplicate tickers
@@ -146,13 +147,15 @@ def generatePortfolio():
     else:
 
         share_volume_list = hp.CalculateShareVolume(tickers, weights, cash)
-    
+
+        sectors = list(hp.find_sectors( tickers, weights) )
         
         weights = list(weights)        
         return redirect(url_for('.ShowPortfolio',
                                 Return=Return,
                                 Risk=Risk,
                                 cash=cash,
+                                sectors=str(sectors),
                                 share_volume_list=str(share_volume_list),
                                 weights=str(weights),
                                 tickers=str(tickers)) )
@@ -213,16 +216,15 @@ def generatePDF():
     return "PDF Generated successfully"
     
 
-def render_table( tickers, weights, share_count, cash ):
+def render_table( tickers, weights, share_count, cash, sectors ):
 
     i = 0
-
    
-    html = "<table class=\"table table\"><thead><tr><th scope=\"col\">#</th><th scope=\"col\">Stock</th><th scope=\"col\">Weight (%)</th><th scope=\"col\">Share Count (£{})</th></tr></thead><tbody>".format(cash)   
+    html = "<table class=\"table table\"><thead><tr><th scope=\"col\">#</th><th scope=\"col\">Stock</th><th scope=\"col\">Sector</th><th scope=\"col\">Weight (%)</th><th scope=\"col\">Share Count (£{})</th></tr></thead><tbody>".format(cash)   
 
     for tick in tickers:
 
-        html = html + '<tr> <th scope=\"row\">{}</th> <td id=\"t1\">{}</td> <td id=\"w1\">{}</td> <td id=\"sv1\">{}</td> </tr>'.format(i+1, tick, weights[i], share_count[i] )
+        html = html + '<tr> <th scope=\"row\">{}</th> <td id=\"t1\">{}</td> <td id=\"t1\">{}</td> <td id=\"w1\">{}</td> <td id=\"sv1\">{}</td> </tr>'.format(i+1, tick, sectors[i],weights[i], share_count[i] )
         i += 1
 
 
@@ -277,15 +279,13 @@ def filter_tickers( tickers, size ):
 
     new_stocks = []
 
-    print( "LIST ", tickers, " SIZE ", size)
-    print( "Missing stock count ", missing_stock_count)
-
+   
     if missing_stock_count > 0:
 
         new_stocks = auto_select_stocks( missing_stock_count )
         tickers.append(new_stocks)
 
-    print( "LIST ", tickers)
+ 
 
     
     return tickers    

@@ -265,6 +265,55 @@ def round_list(param_list):
 
 
 
+def find_sectors( symbols, weights ):
+    
+    data = pd.read_csv("C:\\Users\\marc.smith\\AppData\\Local\\Programs\\Python\\Python37-32\\static\\symbols\\industries.csv")
+
+    sector_list = []
+
+    for item in symbols:
+        sector = data.loc[data['Symbol'] == item, 'Sector'].iloc[0]
+
+        sector_list.append(sector)
+
+    # Make pie chart from the list of sectors
+    plot_sector_chart( sector_list, weights )
+
+    return sector_list 
+
+def plot_sector_chart( sector_list, weights ):
+
+    plt.cla()
+    plt.clf()
+
+    print( "Weights ", weights )
+    print( "Sectors ", sector_list )
+    sector_dictionary = dict(zip(sector_list, weights) )
+
+    print( "Dict ",  sector_dictionary )
+
+    sector_weights = sector_dictionary.values()
+
+
+    
+    fig1, ax1 = plt.subplots()
+    colors = ['yellowgreen', 'gold', 'lightskyblue', 'lightcoral', 'm', 'k', 'c', 'r']
+    patches, texts = plt.pie(sector_weights, colors=colors, startangle=90)
+    plt.legend(patches, sector_list, loc="best")
+    ax1.axis('equal')
+    plt.tight_layout()
+    plt.savefig('static\\images\\sector_makeup.png', bbox_inches='tight')
+    
+
+
+
+
+
+
+
+
+
+    
 
 
 
