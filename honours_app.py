@@ -48,7 +48,7 @@ def ShowPortfolio():
     Weights = ast.literal_eval(Weights)
     Weights = [ weight * 100 for weight in Weights ]
     # Round weights to 2 dec places, maybe should do this in OPT code?
-    Weights = [ round(weight,2) for weight in Weights ]
+    Weights = [ round(weight,3) for weight in Weights ]
 
     Tickers = ast.literal_eval(Tickers)
 
@@ -58,19 +58,7 @@ def ShowPortfolio():
    
     table = render_table( Tickers, Weights, share_volume_list, cash)
   
-    """return render_template('portfolio_summary.html', name = 'Portfolio Weights',
-                           Return = Return,
-                           Sharpe = Sharpe,
-                           Risk= Risk,
-                           w1=Weights[0],w2=Weights[1],w3=Weights[2],w4=Weights[3],
-                           t1=Tickers[0], t2=Tickers[1], t3=Tickers[2], t4=Tickers[3],
-                           cash=cash,
-                           sv1=share_volume_list[0],sv2=share_volume_list[1], sv3=share_volume_list[2],
-                           sv4=share_volume_list[3],
-                           url_pie ='static/images/pie_chart.png',
-                           url_efficient ='static/images/efficient_frontier.png')
-    """
-
+   
     return render_template('portfolio_summary.html', name = 'Portfolio Weights',
                            Return = Return,
                            Sharpe = Sharpe,
@@ -104,13 +92,6 @@ def generatePortfolio():
     if Checked == "on":
         BestRatio = False;
 
-
-    
-    cash = request.form['cash']
-    if(cash == "" ):
-        cash = 10000
-    
-    
     
     # Obtain tickers from user input
     expected_return = request.form['expectedReturn']
@@ -124,6 +105,11 @@ def generatePortfolio():
     _ticker8 = request.form['inputTicker8']
     portfolio_size = request.form['portfolioSize']
 
+    cash = request.form['cash']
+    if(cash == "" ):
+        cash = 10000
+
+
  
     
     # Transorm tickers to appropriate format (Sort + Capitalize)
@@ -133,18 +119,20 @@ def generatePortfolio():
     tickers = [ element.upper() for element in tickers ]
     tickers = sorted(tickers)
 
-    if len(tickers) != len(set(tickers)):
-
+    print( "LIST2 ", tickers)
+    
+    """if tickers_contain_duplicates(tickers):
         # Duplicate tickers
         message = "Please do not include the same ticker more than once."     
-        return redirect(url_for('.Invalid', message=message) )
+        return redirect(url_for('.Invalid', message=message) )"""
         
-    elif (BestRatio==False) and invalid_return(expected_return):   
+    if (BestRatio==False) and invalid_return(expected_return):   
         message = "Expected Return for portfolio must be positive"     
         return redirect(url_for('.Invalid', message=message) )
     
     
     # Perform Optimization 
+    #tickers = Auto_select_stocks(tickers, portfolio_size)
     Return, weights, Risk = hp.OptimizePortfolio(tickers, expected_return, BestRatio, cash)  
 
  
@@ -243,6 +231,29 @@ def render_table( tickers, weights, share_count, cash ):
     return html
 
 
+def tickers_contain_duplicates( tickers ):
+
+    i = 0
+    for item in tickers:
+     
+        ticker = item
+	   
+	# Remove element
+        tickers.split(i,1)
+	   
+	#Check if string is still in array
+	   
+        if item in tickers and ticker != "":   
+            return True	   
+        else:   
+            tickers.split(i, 0, ticker)
+            i += 1
+   
+   
+    return False
+
+
+
 def invalid_return(expected_return):
 
     expected_return = float(expected_return)
@@ -256,13 +267,33 @@ def invalid_return(expected_return):
 
 def filter_tickers( tickers, size ):
 
-    print( "TICKER", tickers )
+    size = int(size)
+   
+    # Remove empty strings from the list
+    tickers = list(filter(None, tickers))
+    missing_stock_count = size - len(tickers)
     
-    tickers = tickers[:int(size)]
+    tickers = tickers[:size]
 
-    print( "TICKER", tickers )
-       
+    new_stocks = []
+
+    print( "LIST ", tickers, " SIZE ", size)
+    print( "Missing stock count ", missing_stock_count)
+
+    if missing_stock_count > 0:
+
+        new_stocks = auto_select_stocks( missing_stock_count )
+        tickers.append(new_stocks)
+
+    print( "LIST ", tickers)
+
+    
     return tickers    
+
+def auto_select_stocks( missing_stock_count):
+
+    stocks = 'COKE'
+    return stocks
 
 
 

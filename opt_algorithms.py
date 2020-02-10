@@ -15,21 +15,21 @@ yahoo_up = True
 
 def OptimizePortfolio(tickers, user_expected_return, FindBestRatio, cash):
 
-     
-    #stocks = [ tickers[0], tickers[1], tickers[2], tickers[3] ]
     stocks = tickers
     stocks = sorted(stocks)
     
-
+    
     if yahoo_up:
         data = web.DataReader( stocks, data_source="yahoo", start='01/01/2010', end='01/01/2020')['Adj Close']
         data.sort_index(inplace=True)
     else:
         data = pd.read_csv('stocks.csv')
         data.sort_index(inplace=True)
-        print( data.columns[0])
         data = data.drop(columns=['Date'])
        
+
+    
+
     
 
     # Validate user provided tickers
@@ -40,7 +40,7 @@ def OptimizePortfolio(tickers, user_expected_return, FindBestRatio, cash):
 
     # Start Optimization (MPT)
 
-    num_portfolios = 1000
+    num_portfolios = 500
 
     # convert daily stock prices into daily returns
     returns = data.pct_change()
@@ -259,7 +259,7 @@ def plot_line_chart(data, tickers, weights, cash):
 
 def round_list(param_list):
     
-    param_list = [ round(elem, 2) for elem in param_list ]
+    param_list = [ round(elem, 3) for elem in param_list ]
 
     return param_list
 
