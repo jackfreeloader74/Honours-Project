@@ -265,9 +265,41 @@ Current priorities:
   behalf of the user).
 
   Fix the current bug where the weights sometimes dont add up to 100%
+-------------------------------------------------------------------------------------------------------------------------------
+
+  Bug where weights were not adding up to 100% has been fixed. Was due to rounding error.
+  
+  Added the groundwork for autoselection of stocks.
+    Had to change the stock input handling logic so that it knows when it needs to fill in the stocks itself.
+    At the moment the app can calculate how many stocks it needs to generate in order to meet the requirements.
+    
+    As for the actual choosing of stocks, I have found csv files that list all nasdaq stocks and their corresponding industries. I can use this to select meaningfull stocks via industry. E.g they have 4 stocks in technology and energy. App could then see this and add a stock from finance sector and a stock from healthcare. ( This makes the selection much more meaningfull than just random selection ).
+    
+ I have used this data to create a new column on the summary page -> "Sector". Informs the user of the sector that each stock is from.
+
+
+CURRENT PRIORITIES:
+
+  Use this sector data to create a pie chart that shows a breakdown of sectors in the portfolio
+ 
+  Develop the auto selection algorithm.
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+
 
 
 -------------------------------------------------------------------------------------------------------------------------------
+
+
+
 
 LIST OF PACKAGES REQUIRED TO RUN APPLICAITON
 
