@@ -265,35 +265,31 @@ def round_list(param_list):
 
 
 
-def find_sectors( symbols, weights ):
+def find_sectors( symbols ):
     
     data = pd.read_csv("C:\\Users\\marc.smith\\AppData\\Local\\Programs\\Python\\Python37-32\\static\\symbols\\industries.csv")
 
     sector_list = []
+    stock_name_list = []
 
     for item in symbols:
+        # Find the companies sector and official name (not ticker)
         sector = data.loc[data['Symbol'] == item, 'Sector'].iloc[0]
+        stock_name = data.loc[data['Symbol'] == item, 'Name'].iloc[0]
 
+        stock_name_list.append(stock_name)
         sector_list.append(sector)
 
-    # Make pie chart from the list of sectors
-    plot_sector_chart( sector_list, weights )
 
-    return sector_list 
+    return sector_list, stock_name_list 
 
 def plot_sector_chart( sector_list, weights ):
 
     plt.cla()
     plt.clf()
 
-    print( "Weights ", weights )
-    print( "Sectors ", sector_list )
-    sector_dictionary = dict(zip(sector_list, weights) )
-
-    print( "Dict ",  sector_dictionary )
-
-    sector_weights = sector_dictionary.values()
-
+   
+    sector_list, sector_weights = calculate_sector_weights( sector_list, weights )
 
     
     fig1, ax1 = plt.subplots()
@@ -308,10 +304,77 @@ def plot_sector_chart( sector_list, weights ):
 
 
 
+def calculate_sector_weights(sector_list, weights):
+
+    technology = 0
+    energy = 0
+    finance = 0
+    energy= 0
+    consumer_services = 0
+    capital_goods = 0
+    health_care = 0
+    consumer_goods = 0
+
+    i =0
+
+    print( "Weights ", weights )
+    print( "Sectors ", sector_list )
+    
+    for sector in sector_list:    
+   
+        if sector == "Technology":
+            technology += weights[i]
+
+        elif sector == "Healthcare":
+            energy += weights[i]
+
+        elif sector == "Finance":
+            finance += weights[i]
+
+        elif sector == "Consumer Goods":
+            consumer_goods += weights[i]
+
+        elif sector == "Energy":
+            energy += weights[i]
+            
+        elif sector == "Consumer Services":
+            consumer_services += weights[i]
+
+        elif sector == "Capital Goods":
+            capital_goods += weights[i]
+
+        elif sector == "Health Care":
+            health_care += weights[i]
+
+        i += 1
 
 
+    sector_weights = [capital_goods, consumer_goods, consumer_services, energy, finance, health_care, technology ]
+    labels = [ "Capital Goods",  "Consumer Services", "Consumer Goods","Energy", "Finance", "Health Care", "Technology" ]
 
+    print( "SzWeights ", sector_weights )
 
+    i = 0
+  
+    for w in sector_weights:
+       
+        if w == 0:
+            labels[i] = ""
+
+        i += 1
+
+    sector_weights = (list(filter(None, sector_weights)))
+    print( "SWeights ", sector_weights )
+    
+    sector_weights = round_list(sector_weights)
+    labels = list(filter(None, labels))
+
+    print( "SWeights ", sector_weights )
+    print( "LSectors ", labels )  
+    
+    return labels, sector_weights
+
+                      
 
     
 

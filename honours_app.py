@@ -37,27 +37,25 @@ def ShowPortfolio():
     Return = request.args['Return']
     Risk = request.args['Risk']
     Weights = request.args['weights']
-    Tickers = request.args['tickers']
+    #Tickers = request.args['tickers']
+    stock_names = request.args['names']
     cash = request.args['cash']
     cash = "{:,.2f}".format(float(cash))
     share_volume_list = request.args['share_volume_list']
     sectors = request.args['sectors']
-
+    
     Sharpe= round(float(Return)/float(Risk),2)
+    Return = float(Return)*100
+    
+    # Convert weights from string back to a list
+    Weights = process_weights( Weights )
 
-    # url_for converts the array to a string, literal_eval converts it back to an array
-    Weights = ast.literal_eval(Weights)
-    Weights = [ weight * 100 for weight in Weights ]
-    # Round weights to 2 dec places, maybe should do this in OPT code?
-    Weights = [ round(weight,3) for weight in Weights ]
-
-
-    Tickers = ast.literal_eval(Tickers)
+    stock_names = ast.literal_eval(stock_names)
     sectors = ast.literal_eval(sectors)
     share_volume_list = ast.literal_eval(share_volume_list)
 
     # Table on summary page is of dynamic length so we create the html here
-    table = render_table( Tickers, Weights, share_volume_list, cash, sectors)
+    table = render_table( stock_names, Weights, share_volume_list, cash, sectors)
   
    
     return render_template('portfolio_summary.html', name = 'Portfolio Weights',
@@ -110,32 +108,30 @@ def generatePortfolio():
     if(cash == "" ):
         cash = 10000
 
-
- 
     
     # Transorm tickers to appropriate format (Sort + Capitalize)
     tickers = [_ticker1,_ticker2, _ticker3, _ticker4, _ticker5
                , _ticker6, _ticker7, _ticker8]
-    tickers = filter_tickers( tickers, portfolio_size )
-    tickers = [ element.upper() for element in tickers ]
-    tickers = sorted(tickers)
 
     
-    
-    """if tickers_contain_duplicates(tickers):
-        # Duplicate tickers
-        message = "Please do not include the same ticker more than once."     
-        return redirect(url_for('.Invalid', message=message) )"""
-        
+    tickers = filter_tickers( tickers, portfolio_size ) # Filter out empty inputs
+    tickers = [ element.upper() for element in tickers ] # Convert to uppercase
+    tickers = sorted(tickers)
+    sector_list, stock_name_list = list(hp.find_sectors( tickers ) ) # What sectors do they belong to
+
+
+    tickers, sector_list = auto_select_stocks( portfolio_size, tickers, sector_list) # Find stocks to add to portfolio
+
+
+
     if (BestRatio==False) and invalid_return(expected_return):   
         message = "Expected Return for portfolio must be positive"     
         return redirect(url_for('.Invalid', message=message) )
     
     
     # Perform Optimization 
-    #tickers = Auto_select_stocks(tickers, portfolio_size)
     Return, weights, Risk = hp.OptimizePortfolio(tickers, expected_return, BestRatio, cash)  
-
+    
  
     # Check if any of the tickers entered by the user is invalid
     if Return == False:
@@ -145,20 +141,22 @@ def generatePortfolio():
         return redirect(url_for('.Invalid', message=message) )
         
     else:
-
+        # Calculate the number of shares that can be bought
         share_volume_list = hp.CalculateShareVolume(tickers, weights, cash)
 
-        sectors = list(hp.find_sectors( tickers, weights) )
+        # Make pie chart from the list of sectors
+        hp.plot_sector_chart( sector_list, weights )
         
         weights = list(weights)        
         return redirect(url_for('.ShowPortfolio',
                                 Return=Return,
                                 Risk=Risk,
                                 cash=cash,
-                                sectors=str(sectors),
+                                sectors=str(sector_list),
                                 share_volume_list=str(share_volume_list),
                                 weights=str(weights),
-                                tickers=str(tickers)) )
+                                names=str(stock_name_list) ) )
+                                #tickers=str(tickers)) )
   
   
 
@@ -180,7 +178,7 @@ def generatePDF():
     table = request.args.get('table')
 
 
-    #print( "Row Data", rowData)
+   
     Sharpe = round(float(expected_return)/float(risk),2)
     
     tickers = request.args.get('Tickers')
@@ -233,6 +231,17 @@ def render_table( tickers, weights, share_count, cash, sectors ):
     return html
 
 
+def process_weights( Weights ):
+
+    # url_for converts the array to a string, literal_eval converts it back to an array
+    Weights = ast.literal_eval(Weights)
+    Weights = [ weight * 100 for weight in Weights ]
+
+    # Round weights to 2 dec places, maybe should do this in OPT code?
+    Weights = [ round(weight,3) for weight in Weights ]
+
+    return Weights
+
 def tickers_contain_duplicates( tickers ):
 
     i = 0
@@ -267,33 +276,54 @@ def invalid_return(expected_return):
 
 
 
+# Reduce the list of tickers to the size provided by the user
+
 def filter_tickers( tickers, size ):
 
     size = int(size)
    
     # Remove empty strings from the list
     tickers = list(filter(None, tickers))
-    missing_stock_count = size - len(tickers)
-    
     tickers = tickers[:size]
+  
+    return tickers    
+
+
+"""
+missing_stock_count = How many stocks the app needs to choose for the user
+"""
+
+def auto_select_stocks( size, tickers, sectors ):
 
     new_stocks = []
 
+    missing_stock_count = int(size) - len(tickers)
+    tickers = sorted(tickers)
    
     if missing_stock_count > 0:
 
-        new_stocks = auto_select_stocks( missing_stock_count )
-        tickers.append(new_stocks)
+        new_stocks, new_sectors = add_stocks( missing_stock_count, tickers, sectors )
+        tickers.extend(new_stocks)
+        
+        tickers = sorted(tickers)
 
- 
+        i = 0
+        for stock in new_stocks:
+            index = tickers.index( stock )
+            sectors.insert( index, new_sectors[i] )
+            i += 1
 
-    
-    return tickers    
+    return tickers, sectors
 
-def auto_select_stocks( missing_stock_count):
 
-    stocks = 'COKE'
-    return stocks
+def add_stocks( num_stocks, tickers, sectors ):
+
+    found_stocks = ['COKE']
+    found_sectors = ['Consumer Goods']
+
+    return found_stocks, found_sectors
+
+
 
 
 
@@ -302,7 +332,7 @@ if __name__ == "__main__":
 
 @app.after_request
 def add_header(response):
-    # response.cache_control.no_store = True
+    
     response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, public, max-age=0, revalidate, post-check=0, pre-check=0, max-age=0'
     response.headers['Pragma'] = 'no-cache'
     response.headers['Expires'] = '-1'
