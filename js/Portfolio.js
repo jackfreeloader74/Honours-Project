@@ -19,7 +19,7 @@ function init()
 	//$("#span1").hide()
 	
 	//$("#loader").hide();
-	
+	$("#specifyMinReturnLabel").css("font-weight", "normal")
 	
 	$("#appointmentEditDialog").dialog({	modal:true,			//modal dialog to disable parent when dialog is active
 	autoOpen:false,		//set autoOpen to false, hidding dialog after creation
@@ -42,6 +42,10 @@ function init()
 
 function checkIfArrayContainsDuplicates(arr) {
    
+   
+   arr = arr.map(function(x){ return x.toUpperCase() })
+   
+   
    for(i=0; i < arr.length; i++)
    {  
 	   ticker = arr[i];
@@ -51,7 +55,7 @@ function checkIfArrayContainsDuplicates(arr) {
 	   
 	   // Check if string is still in array
 	   
-	   if( arr.includes(ticker) )
+	   if( arr.includes(ticker) && ticker != "")
 	   {
 		   return true;
 	   }
@@ -147,7 +151,8 @@ $(function() {
 			$("#expectedReturnLabel").show();
 			$("#returnHelp").show();
 			
-			
+			$("#specifyMinReturnLabel").css("font-weight", "bold")
+			$("#checkBoxLabel").css("font-weight", "normal")
 			//$("#checkBoxLabel").text("Find best risk-reward ratio ");
 			
 			
@@ -160,6 +165,10 @@ $(function() {
 			$("#returnHelp").hide();
 			$("#expectedReturn").val("")
 			$("#expectedReturn").prop('required', false );
+			
+			$("#specifyMinReturnLabel").css("font-weight", "normal")
+			$("#checkBoxLabel").css("font-weight", "bold")
+			
 			//$("#checkBoxLabel").text("Specify Minimum Return");
 		}
 			
