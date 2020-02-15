@@ -66,7 +66,7 @@
 			<div style="display: inline-flex;" class="input-group"> 
 				<ul class="list-group">
 					<li class="list-group-item">Apple = AAPL</li>
-					<li class="list-group-item">Alphabet (Google) = GOOGLE</li>
+					<li class="list-group-item">Alphabet (Google) = GOOG</li>
 					<li class="list-group-item">Amazon = AMZN</li>
 					<li class="list-group-item">Coke = COKE</li>
 					<li class="list-group-item">Facebook = FB</li>
@@ -113,7 +113,8 @@
 					<span class="slider round"></span>
 					
 				</label>
-				<label>Specify Minimum Return</label>
+				
+				<label id="specifyMinReturnLabel">Specify Minimum Return</label>
 				
 				
 				<div class="form-group">
@@ -138,24 +139,24 @@
 				
 				<div class="input-group">
 					
-					<input type="name" name="inputTicker1" id="inputTicker1" class="form-control" placeholder="Stock Ticker 1" required autofocus>
+					<input type="name" name="inputTicker1" id="inputTicker1" class="form-control" placeholder="Stock Ticker 1" autofocus>
 				
 					<span  style="visibility: hidden;"  class="input-group-addon"></span>
 						
 						<div style="padding-left: 10px;">
-							<input type="name" name="inputTicker5" id="inputTicker5" class="form-control" placeholder="Stock Ticker 5" required>
+							<input type="name" name="inputTicker5" id="inputTicker5" class="form-control" placeholder="Stock Ticker 5">
 						</div>
 				</div>
 				
 				<!-- INPUT 2 AND 6 -->
 				<div class="input-group">
 					
-					<input type="name" name="inputTicker2" id="inputTicker2" class="form-control" placeholder="Stock Ticker 2" required autofocus>
+					<input type="name" name="inputTicker2" id="inputTicker2" class="form-control" placeholder="Stock Ticker 2"  autofocus>
 					
 					<span  style="visibility: hidden;"  class="input-group-addon"></span>
 						
 					<div style="padding-left: 10px;">
-						<input type="name" name="inputTicker6" id="inputTicker6" class="form-control" placeholder="Stock Ticker 6" required autofocus>
+						<input type="name" name="inputTicker6" id="inputTicker6" class="form-control" placeholder="Stock Ticker 6"  autofocus>
 					</div>
 				</div>
 					
@@ -163,12 +164,12 @@
 					
 				<!-- INPUT 3 AND 7 -->
 				<div class="input-group">
-					<input type="name" name="inputTicker3" id="inputTicker3" class="form-control" placeholder="Stock Ticker 3" required>	
+					<input type="name" name="inputTicker3" id="inputTicker3" class="form-control" placeholder="Stock Ticker 3" >	
 					
 					<span  style="visibility: hidden;"  class="input-group-addon"></span>
 						
 					<div style="padding-left: 10px;">
-						<input type="name" name="inputTicker7" id="inputTicker7" class="form-control" placeholder="Stock Ticker 7" required autofocus>
+						<input type="name" name="inputTicker7" id="inputTicker7" class="form-control" placeholder="Stock Ticker 7" autofocus>
 					</div>
 				
 				</div>	
@@ -177,17 +178,17 @@
 				<!-- INPUT 4 AND 8 -->
 				<div class="input-group">
 							
-					<input type="name" name="inputTicker4" id="inputTicker4" class="form-control" placeholder="Stock Ticker 4" required>
+					<input type="name" name="inputTicker4" id="inputTicker4" class="form-control" placeholder="Stock Ticker 4">
 						<span  style="visibility: hidden;"  class="input-group-addon"></span>
 						
 					<div style="padding-left: 10px;">
-						<input type="name" name="inputTicker8" id="inputTicker8" class="form-control" placeholder="Stock Ticker 8" required autofocus>
+						<input type="name" name="inputTicker8" id="inputTicker8" class="form-control" placeholder="Stock Ticker 8" autofocus>
 					</div>
 						
 				</div>
 				
 				
-				<button id="view_ticker_btn" type="button" class="btn-link" data-toggle="modal" data-target="#myModal">View Stocks</button>
+				<button id="view_ticker_btn" type="button" class="btn-link" data-toggle="modal" data-target="#myModal">View Popular Stocks</button>
 	
 
 				

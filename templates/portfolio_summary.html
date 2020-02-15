@@ -72,15 +72,15 @@
 				<thead>
 					<tr>
 						
-						<th scope="col">Annual Expected Return</th>
-						<th scope="col">Volatility</th>
-						<th scope="col">Sharpe Ratio</th>
+						<th scope="col">Annual Expected Return (AER)</th>
+						<th scope="col">Volatility (V)</th>
+						<th scope="col">Sharpe Ratio (AER/V)</th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr>
 						
-						<td id="return">{{ Return }}</td>
+						<td id="return">{{ Return }}%</td>
 						<td id="risk">{{ Risk }}</td>
 						<td id="sharpe">{{ Sharpe }}</td>
 					</tr>
@@ -108,12 +108,12 @@
 				<span  style="visibility: hidden;"  class="input-group-addon"></span>
 						
 				<div style="padding-left: 10px;">
-					<img class="middle-img" src={{ url_efficient }} height="300" width="300"/>
+					<img class="middle-img" src="static/images/sector_makeup.png" height="300" width="300"/>
 				</div>
 		</div>
 		
 		
-		
+		<img class="middle-img" src={{ url_efficient }} height="300" width="300"/>
 		
 		
 			
