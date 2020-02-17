@@ -285,6 +285,111 @@ CURRENT PRIORITIES:
   Develop the auto selection algorithm.
 
 
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+10/02/2020
+
+Did informal testing with Caitlin
+
+1) Move "Enter stocks in ticker form" instruction from after the inputs to before (Since user is reading form top to bottom)
+
+2) Above pie chart that specifies portfolio weight breakdown -> Specify what the chart represents in form of a title
+
+3) Labels on all charts need to be bigger
+
+4) On portfolio performane chart, change title "Portfolio performance" to "Portfolio Performance over last x year"
+
+5) Portfolio summary table 1, add short hand variables to the column names:
+
+Go from ->   "Annual Expected Return        Volatility             Sharpe Ratio"
+
+To    ->   "Annual Expected Return(AER)        Volatility (V)             Sharpe Ratio (AER/V)
+
+This helps user understands what sharpe ratio is
+
+NOTE -> Caitlin is not familiar with financial terminology and stock market theory so the testing feedback was mainly focused on UI layout
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+11/02/2020
+
+Further feedback from caitlin ( most of the suggestions from last session has been implemented )
+
+1)  Change button that shows a list of stocks and tickers from "View Stocks" to "View Popular Stocks"
+
+2)  For the slider/checkbox -> Have both text options show on either side and have the one currently selected, highlighted in bold.
+
+  E.g.    Find Best Risk to reward ratio   []   Specify minimum level of return
+  
+  This makes the functionality clearer and easier to understand for the user.
+  
+3) Potentially add a popup that spawns when you open the application (or opens via a button ) that in detail explains how the app works
+  It's would be quite difficult to explain in detail how the auto selection works and what the optimization means so a way to explain
+  this to the user would be usefull. ( This is not part of the requirements so may only be implemented if I have time ).
+  
+
+
+  
+
+
+-------------------------------------------------------------------------------------------------------------------------------
+15/02/2020
+
+Did informal testing with Nick:
+( Had more comments on the finance logic than UI presentation and layout )
+
+
+Share count column - move money value (10,000 to the top table) 
+and add an extra column on the table 2 for the current share price.
+
+The expected return value on table 1 should be a %
+
+The stock name column in table 2 should be the stocks actual name and not a ticker
+
+Point to express -> The algorithm looks over a 10 year period. Amazon did really well in that time (huge increase in share price)
+but that level of increase is often not sustainable and will peak off. Despite this the algorithm will always favour putting more in amazon because of this. This highlightes the weakness of MPT
+
+
+
+
+-------------------------------------------------------------------------------------------------------------------------------
+17/02/2020
+
+1) Completed sector pie chart breakdown
+
+2) Came across bug in application with the finance API when calculating the current share price of a stock. The date logic
+only accounted for weekends and out of hours trading when the stock market is closed.
+
+This does not account for the holidays throughout the year where the market is also closed. E.g. presidents day, thanksgiving.
+Had to right code that used a different date if the today is a holiday.
+
+3) Added the majority of logic for stock autoselection. Now if you enter no stocks on the submission page, the app will find the required number of portfolios and will do so via sector.
+
+Specifically each time it tries to select a stock, it will look at which sector is currently least invested in:
+
+E.g. Portfolio size of 4 and user has provided:
+
+AMZN - Consumer Services
+AAPL - TECHNOLOGY
+XOM - Energy
+
+The app will see that the user has no investments in the finance sector so will select a stock from that industry to add to the portfolio. E.g. Leisure Acquisition Corp
+
+
+I will still need to test some other scenarios for auto-selection to make sure it all works.
+
+Current priorities:
+
+ 1) Perform more testing and fixes for stock auto-selection
+ 2) Perform ground work for alternate optimization algorithm (Sortino ratio)  
+  
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
     
     
     
