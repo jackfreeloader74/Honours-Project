@@ -37,8 +37,7 @@ def ShowPortfolio():
     Return = request.args['Return']
     Risk = request.args['Risk']
     Weights = request.args['weights']
-    #Tickers = request.args['tickers']
-    stock_names = request.args['names']
+    tickers = request.args['tickers']
     cash = request.args['cash']
     cash = "{:,.2f}".format(float(cash))
     share_volume_list = request.args['share_volume_list']
@@ -50,11 +49,15 @@ def ShowPortfolio():
     # Convert weights from string back to a list
     Weights = process_weights( Weights )
 
-    stock_names = ast.literal_eval(stock_names)
+    tickers = ast.literal_eval(tickers)
     sectors = ast.literal_eval(sectors)
     share_volume_list = ast.literal_eval(share_volume_list)
 
     # Table on summary page is of dynamic length so we create the html here
+
+    stock_names = hp.find_stock_names( tickers )
+    
+
     table = render_table( stock_names, Weights, share_volume_list, cash, sectors)
   
    
@@ -115,18 +118,22 @@ def generatePortfolio():
 
     
     tickers = filter_tickers( tickers, portfolio_size ) # Filter out empty inputs
-    tickers = [ element.upper() for element in tickers ] # Convert to uppercase
-    tickers = sorted(tickers)
-    sector_list, stock_name_list = list(hp.find_sectors( tickers ) ) # What sectors do they belong to
+
+    
+    # Calculate what sectors these belong to as well as the stocks official name
+    sector_list = list(hp.find_sectors( tickers ) ) # What sectors do they belong to
 
 
+    print( "This is the sector list ", sector_list)
     tickers, sector_list = auto_select_stocks( portfolio_size, tickers, sector_list) # Find stocks to add to portfolio
 
+    
 
 
     if (BestRatio==False) and invalid_return(expected_return):   
         message = "Expected Return for portfolio must be positive"     
         return redirect(url_for('.Invalid', message=message) )
+
     
     
     # Perform Optimization 
@@ -155,8 +162,7 @@ def generatePortfolio():
                                 sectors=str(sector_list),
                                 share_volume_list=str(share_volume_list),
                                 weights=str(weights),
-                                names=str(stock_name_list) ) )
-                                #tickers=str(tickers)) )
+                                tickers=str(tickers)) )
   
   
 
@@ -212,6 +218,11 @@ def generatePDF():
 
 
     return "PDF Generated successfully"
+
+
+
+
+
     
 
 def render_table( tickers, weights, share_count, cash, sectors ):
@@ -285,6 +296,9 @@ def filter_tickers( tickers, size ):
     # Remove empty strings from the list
     tickers = list(filter(None, tickers))
     tickers = tickers[:size]
+
+    tickers = [ element.upper() for element in tickers ] # Convert to uppercase
+    tickers = sorted(tickers)
   
     return tickers    
 
@@ -293,35 +307,39 @@ def filter_tickers( tickers, size ):
 missing_stock_count = How many stocks the app needs to choose for the user
 """
 
-def auto_select_stocks( size, tickers, sectors ):
+def auto_select_stocks( size, tickers,  sectors ):
 
     new_stocks = []
 
     missing_stock_count = int(size) - len(tickers)
     tickers = sorted(tickers)
-   
+
+
+    # If we need to select any stocks
     if missing_stock_count > 0:
 
-        new_stocks, new_sectors = add_stocks( missing_stock_count, tickers, sectors )
+        # Put newly found stocks into a list
+        new_stocks, new_sectors = hp.add_stocks( missing_stock_count, tickers, sectors )
+
+
+        # Add new stocks to our original list of stocks
         tickers.extend(new_stocks)
-        
         tickers = sorted(tickers)
 
         i = 0
+
+        # The sectors that correspond the new stocks must be placed in the original sector list
+        # at the same index as the new stock was placed in
         for stock in new_stocks:
-            index = tickers.index( stock )
-            sectors.insert( index, new_sectors[i] )
+            index = tickers.index( stock )    
+            sectors.insert( index, new_sectors[i] ) 
+             
             i += 1
 
     return tickers, sectors
 
 
-def add_stocks( num_stocks, tickers, sectors ):
 
-    found_stocks = ['COKE']
-    found_sectors = ['Consumer Goods']
-
-    return found_stocks, found_sectors
 
 
 

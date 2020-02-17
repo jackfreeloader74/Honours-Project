@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from dateutil.relativedelta import relativedelta
 from datetime import timedelta
 
+import portfolio_lib as pl
 
 url = "https://finance.yahoo.com/quote/{}/history"
 
@@ -18,9 +19,11 @@ def OptimizePortfolio(tickers, user_expected_return, FindBestRatio, cash):
     stocks = tickers
     stocks = sorted(stocks)
     
+
+    print( "The final stocks ", stocks )
     
     if yahoo_up:
-        data = web.DataReader( stocks, data_source="yahoo", start='01/01/2010', end='01/01/2020')['Adj Close']
+        data = web.DataReader( stocks, data_source="yahoo", start='01/01/2018', end='01/01/2020')['Adj Close']
         data.sort_index(inplace=True)
     else:
         data = pd.read_csv('stocks.csv')
@@ -155,6 +158,12 @@ def CalculateShareVolume( tickers, weights, cash ):
 
 
 
+"""
+Find and return the current share value for the stock
+
+Had lots of issued with dates because the stock market closes on weekends, holidays and
+doesnt open in the UK until late afternoon
+"""
 
 def share_price( ticker ):
 
@@ -163,9 +172,11 @@ def share_price( ticker ):
     open_time = dt.time(15, 0, 0 )
     
     # If its before 3pm, use the price from the day before
-    # If its a monday or monday use info from saturday
+    # If its a holiday, use the previous available day
 
-    if one.time() < open_time:
+    if pl.isHoliday( one ):
+        one = pl.find_suitable_date( one )
+    elif one.time() < open_time:
         if one.weekday() == 0:
             one = one - timedelta(days=2)
         else:
@@ -176,26 +187,24 @@ def share_price( ticker ):
 
     elif( one.weekday() == 6 ):
         one = one - timedelta(days=2)
+ 
 
-    
+    # Format date for the datareader
     date_formated = one.strftime("%m/%d/%Y")
 
-   
-   
-    
+    print( "This is the date ", date_formated )
+
     stocks = [ticker]
-    
+
+    # Read the Adj Close for the 1 stock on a single day
     data = web.DataReader( stocks, data_source="yahoo", start=date_formated, end=date_formated)['Adj Close']
 
     data.sort_index(inplace=True)
 
-    
-
-
-    value = data[ticker].iloc[0]
+    # Obtain the adj close
+    value = data[ticker].iloc[0]   
 
    
-    
     return value
 
 
@@ -264,6 +273,19 @@ def round_list(param_list):
     return param_list
 
 
+def find_stock_names( tickers ):
+
+    data = pd.read_csv("C:\\Users\\marc.smith\\AppData\\Local\\Programs\\Python\\Python37-32\\static\\symbols\\industries.csv")
+
+    stock_name_list = []
+
+    for item in tickers:
+        stock_name = data.loc[data['Symbol'] == item, 'Name'].iloc[0]
+
+        stock_name_list.append( stock_name )
+
+    return stock_name_list
+
 
 def find_sectors( symbols ):
     
@@ -277,20 +299,20 @@ def find_sectors( symbols ):
         sector = data.loc[data['Symbol'] == item, 'Sector'].iloc[0]
         stock_name = data.loc[data['Symbol'] == item, 'Name'].iloc[0]
 
-        stock_name_list.append(stock_name)
         sector_list.append(sector)
 
-
-    return sector_list, stock_name_list 
+    return sector_list
 
 def plot_sector_chart( sector_list, weights ):
 
     plt.cla()
     plt.clf()
 
+    
    
     sector_list, sector_weights = calculate_sector_weights( sector_list, weights )
 
+   
     
     fig1, ax1 = plt.subplots()
     colors = ['yellowgreen', 'gold', 'lightskyblue', 'lightcoral', 'm', 'k', 'c', 'r']
@@ -303,8 +325,43 @@ def plot_sector_chart( sector_list, weights ):
 
 
 
+"""
+Combine weights of stocks that belong to the same sector so
+the user can see how much they have invested in each sector
+
+"""
 
 def calculate_sector_weights(sector_list, weights):
+
+    sector_weights = perform_sector_count( sector_list, weights )
+
+    labels = [ "Capital Goods",  "Consumer Non-Durables", "Consumer Services" ,"Energy", "Finance", "Health Care", "Technology" ]
+
+
+    i = 0
+  
+    for w in sector_weights:
+       
+        if w == 0:
+            labels[i] = ""
+
+        i += 1
+
+    sector_weights = (list(filter(None, sector_weights)))
+
+   
+    sector_weights = round_list(sector_weights)
+    labels = list(filter(None, labels))
+
+ 
+    
+    return labels, sector_weights
+
+
+
+
+                      
+def perform_sector_count( sector_list, weights ):
 
     technology = 0
     energy = 0
@@ -313,12 +370,10 @@ def calculate_sector_weights(sector_list, weights):
     consumer_services = 0
     capital_goods = 0
     health_care = 0
-    consumer_goods = 0
+    consumer_non_durables = 0
 
     i =0
 
-    print( "Weights ", weights )
-    print( "Sectors ", sector_list )
     
     for sector in sector_list:    
    
@@ -331,8 +386,8 @@ def calculate_sector_weights(sector_list, weights):
         elif sector == "Finance":
             finance += weights[i]
 
-        elif sector == "Consumer Goods":
-            consumer_goods += weights[i]
+        elif sector == "Consumer Non-Durables":
+            consumer_non_durables += weights[i]
 
         elif sector == "Energy":
             energy += weights[i]
@@ -348,35 +403,114 @@ def calculate_sector_weights(sector_list, weights):
 
         i += 1
 
+    
+    sector_weights = [capital_goods, consumer_non_durables, consumer_services, energy, finance, health_care, technology ]
 
-    sector_weights = [capital_goods, consumer_goods, consumer_services, energy, finance, health_care, technology ]
-    labels = [ "Capital Goods",  "Consumer Services", "Consumer Goods","Energy", "Finance", "Health Care", "Technology" ]
+    return sector_weights
 
-    print( "SzWeights ", sector_weights )
 
+
+
+def add_stocks( num_stocks, tickers, sectors ):
+
+    found_stocks = []
+    found_sectors = []
+
+    sector_list = sectors.copy()
+    
+   
+    labels = [ "Capital Goods",  "Consumer Non-Durables", "Consumer Services" ,"Energy", "Finance", "Health Care", "Technology" ]
+    
+    
     i = 0
-  
-    for w in sector_weights:
-       
-        if w == 0:
-            labels[i] = ""
 
+    #Used to hold a list of all sectors that the user does not have in their portfolio
+    missing_sectors = []
+
+    for label in labels:
+        if label not in sector_list:
+          
+            missing_sectors.append( labels[i] )
         i += 1
 
-    sector_weights = (list(filter(None, sector_weights)))
-    print( "SWeights ", sector_weights )
-    
-    sector_weights = round_list(sector_weights)
-    labels = list(filter(None, labels))
 
-    print( "SWeights ", sector_weights )
-    print( "LSectors ", labels )  
-    
-    return labels, sector_weights
+    #print( "Missing ", missing_sectors )
 
-                      
+    # Add stocks that have sectors that have 0 occurences in the current portfolio
+    # What if there are more misisng sectors than new stocks required???
+    
+    for x in range(0,len(missing_sectors)):
+
+        # Find random stock belonging to that sector       
+        stock = find_stock_in_sector( missing_sectors[x])
+
+        found_stocks.append( stock )
+        found_sectors.append( missing_sectors[x] )
+
+        sector_list.append( missing_sectors [x] )
+        num_stocks -= 1
+
+
+    # If there are still more stocks to find, use the least occuring sector
+
+    #print( "After the first find, this is how many are left ", num_stocks )
+    #print( "Stocks ", stocks )
+    #print( "Sectors ", sectors )
 
     
+    if num_stocks != 0:
+        
+        for x in range( 0, num_stocks ):       
+            c, least = len(sector_list), 0
+
+            for x in sector_list:
+                if sector_list.count(x) <= c :
+                    c = sector_list.count(x)
+                    least = x
+
+
+            stock = find_stock_in_sector( least )        
+
+            found_sectors.append(least)
+            found_stocks.append( stock )
+       
+    
+
+  
+        
+        
+    return found_stocks, found_sectors
+
+def find_stock_in_sector( sector ):
+    
+    data = pd.read_csv("C:\\Users\\marc.smith\\AppData\\Local\\Programs\\Python\\Python37-32\\static\\symbols\\industries.csv")
+
+   
+      
+    data = data.loc[data['Sector'] == sector, 'Symbol']
+
+
+    symbol = data.sample().iloc[0]
+
+
+
+    return symbol
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
