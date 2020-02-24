@@ -34,7 +34,7 @@ def about():
 @app.route('/ShowPortfolio')
 def ShowPortfolio():
 
-    Return = request.args['Return']
+    Return = float(request.args['Return'])
     Risk = request.args['Risk']
     Weights = request.args['weights']
     tickers = request.args['tickers']
@@ -43,6 +43,7 @@ def ShowPortfolio():
     share_volume_list = request.args['share_volume_list']
     sectors = request.args['sectors']
     
+    Return = round(Return, 3)
     Sharpe= round(float(Return)/float(Risk),2)
     Return = float(Return)*100
     
@@ -66,7 +67,7 @@ def ShowPortfolio():
                            Sharpe = Sharpe,
                            Risk= Risk,
                            table=table,
-                           cash=cash,    
+                           Cash=cash,    
                            url_pie ='static/images/pie_chart.png',
                            url_efficient ='static/images/efficient_frontier.png')
 
@@ -124,29 +125,27 @@ def generatePortfolio():
     sector_list = list(hp.find_sectors( tickers ) ) # What sectors do they belong to
 
 
-    print( "This is the sector list ", sector_list)
-    tickers, sector_list = auto_select_stocks( portfolio_size, tickers, sector_list) # Find stocks to add to portfolio
+    tickers = auto_select_stocks( portfolio_size, tickers, sector_list) # Find stocks to add to portfolio
 
     
+    sector_list = list(hp.find_sectors( tickers ) )
 
-
-    if (BestRatio==False) and invalid_return(expected_return):   
-        message = "Expected Return for portfolio must be positive"     
-        return redirect(url_for('.Invalid', message=message) )
-
-    
     
     # Perform Optimization 
     Return, weights, Risk = hp.OptimizePortfolio(tickers, expected_return, BestRatio, cash)  
+
     
  
     # Check if any of the tickers entered by the user is invalid
-    if Return == False:
+    if Return == False :
         
         # Optimization failed - Invalid ticker
         message = "Invalid Ticker Entered: %s" % weights     
         return redirect(url_for('.Invalid', message=message) )
-        
+    elif len(sector_list) == 1:
+        # Optimization failed - Invalid ticker
+        message = "Invalid Ticker Entered: %s" % sector_list     
+        return redirect(url_for('.Invalid', message=message) )
     else:
         # Calculate the number of shares that can be bought
         share_volume_list = hp.CalculateShareVolume(tickers, weights, cash)
@@ -179,13 +178,15 @@ def generatePDF():
     # Get portfolio details so they can be applied to the PDF
 
     # Grab parameters from get request
-    expected_return = request.args.get('Return')
+    expected_return_str = request.args.get('Return')
     risk = request.args.get('Risk')
     table = request.args.get('table')
 
 
-   
-    Sharpe = round(float(expected_return)/float(risk),2)
+    # Need to remove the % so the sharpe ratio can be calcluated
+    exp_return = float(expected_return_str.replace("%", "")) 
+    
+    Sharpe = round((exp_return/100)/float(risk),2)
     
     tickers = request.args.get('Tickers')
     weights = request.args.get('Weights')
@@ -201,7 +202,7 @@ def generatePDF():
     
     # Render html file with all required data
     rendered = render_template('portfolio_pdf.html',
-                               Return=expected_return,
+                               Return=expected_return_str,
                                Risk=risk,
                                Sharpe=Sharpe,
                                url_pie='C:/Users/marc.smith/AppData/Local/Programs/Python/Python37-32/static/images/pie_chart.png',
@@ -229,11 +230,17 @@ def render_table( tickers, weights, share_count, cash, sectors ):
 
     i = 0
    
-    html = "<table class=\"table table\"><thead><tr><th scope=\"col\">#</th><th scope=\"col\">Stock</th><th scope=\"col\">Sector</th><th scope=\"col\">Weight (%)</th><th scope=\"col\">Share Count (£{})</th></tr></thead><tbody>".format(cash)   
+    html = '''<table class=\"table table\"><thead><tr><th scope=\"col\">#</th>
+            <th scope=\"col\">Stock</th>
+            <th scope=\"col\">Sector</th>
+            <th scope=\"col\">Weight (%)</th>
+            <th scope=\"col\">Share Count</th>
+            </tr></thead><tbody>'''.format(cash)   
 
     for tick in tickers:
 
-        html = html + '<tr> <th scope=\"row\">{}</th> <td id=\"t1\">{}</td> <td id=\"t1\">{}</td> <td id=\"w1\">{}</td> <td id=\"sv1\">{}</td> </tr>'.format(i+1, tick, sectors[i],weights[i], share_count[i] )
+        html = html + '<tr> <th scope=\"row\">{}</th> <td id=\"t1\">{}</td> <td id=\"t1\">{}</td> <td id=\"w1\">{}</td> <td id=\"sv1\">{}</td> </tr>'.format(
+            i+1, tick, sectors[i],weights[i], share_count[i] )
         i += 1
 
 
@@ -319,24 +326,16 @@ def auto_select_stocks( size, tickers,  sectors ):
     if missing_stock_count > 0:
 
         # Put newly found stocks into a list
-        new_stocks, new_sectors = hp.add_stocks( missing_stock_count, tickers, sectors )
+        new_stocks = hp.add_stocks( missing_stock_count, tickers, sectors )
 
 
         # Add new stocks to our original list of stocks
         tickers.extend(new_stocks)
         tickers = sorted(tickers)
 
-        i = 0
 
-        # The sectors that correspond the new stocks must be placed in the original sector list
-        # at the same index as the new stock was placed in
-        for stock in new_stocks:
-            index = tickers.index( stock )    
-            sectors.insert( index, new_sectors[i] ) 
-             
-            i += 1
-
-    return tickers, sectors
+      
+    return tickers
 
 
 

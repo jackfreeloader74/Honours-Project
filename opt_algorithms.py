@@ -8,8 +8,6 @@ from datetime import timedelta
 
 import portfolio_lib as pl
 
-url = "https://finance.yahoo.com/quote/{}/history"
-
 
 yahoo_up = True
 
@@ -19,8 +17,6 @@ def OptimizePortfolio(tickers, user_expected_return, FindBestRatio, cash):
     stocks = tickers
     stocks = sorted(stocks)
     
-
-    print( "The final stocks ", stocks )
     
     if yahoo_up:
         data = web.DataReader( stocks, data_source="yahoo", start='01/01/2018', end='01/01/2020')['Adj Close']
@@ -29,11 +25,8 @@ def OptimizePortfolio(tickers, user_expected_return, FindBestRatio, cash):
         data = pd.read_csv('stocks.csv')
         data.sort_index(inplace=True)
         data = data.drop(columns=['Date'])
-       
 
-    
-
-    
+  
 
     # Validate user provided tickers
     for ticker in stocks:
@@ -43,7 +36,8 @@ def OptimizePortfolio(tickers, user_expected_return, FindBestRatio, cash):
 
     # Start Optimization (MPT)
 
-    num_portfolios = 500
+    # Specify number of iterations to create
+    num_portfolios = 1500
 
     # convert daily stock prices into daily returns
     returns = data.pct_change()
@@ -61,10 +55,8 @@ def OptimizePortfolio(tickers, user_expected_return, FindBestRatio, cash):
     
     print("Starting optimization...")
 
+    
     for i in range(num_portfolios):
-
-
-        
     
         #select random weights for portfolio assets
         weights = np.random.random(len(stocks)) 
@@ -192,7 +184,7 @@ def share_price( ticker ):
     # Format date for the datareader
     date_formated = one.strftime("%m/%d/%Y")
 
-    print( "This is the date ", date_formated )
+ 
 
     stocks = [ticker]
 
@@ -296,10 +288,17 @@ def find_sectors( symbols ):
 
     for item in symbols:
         # Find the companies sector and official name (not ticker)
-        sector = data.loc[data['Symbol'] == item, 'Sector'].iloc[0]
-        stock_name = data.loc[data['Symbol'] == item, 'Name'].iloc[0]
-
-        sector_list.append(sector)
+        try:
+            sector = data.loc[data['Symbol'] == item, 'Sector'].iloc[0]
+            stock_name = data.loc[data['Symbol'] == item, 'Name'].iloc[0]
+    
+        except:
+            sector = ""
+            
+        if( sector == "" ):
+            return item
+        else:
+            sector_list.append(sector)
 
     return sector_list
 
@@ -414,19 +413,15 @@ def perform_sector_count( sector_list, weights ):
 def add_stocks( num_stocks, tickers, sectors ):
 
     found_stocks = []
-    found_sectors = []
-
     sector_list = sectors.copy()
-    
-   
+       
     labels = [ "Capital Goods",  "Consumer Non-Durables", "Consumer Services" ,"Energy", "Finance", "Health Care", "Technology" ]
     
-    
-    i = 0
-
+  
     #Used to hold a list of all sectors that the user does not have in their portfolio
     missing_sectors = []
 
+    i = 0
     for label in labels:
         if label not in sector_list:
           
@@ -434,28 +429,26 @@ def add_stocks( num_stocks, tickers, sectors ):
         i += 1
 
 
-    #print( "Missing ", missing_sectors )
-
     # Add stocks that have sectors that have 0 occurences in the current portfolio
     # What if there are more misisng sectors than new stocks required???
+
+    max_iterator = len(missing_sectors)
     
-    for x in range(0,len(missing_sectors)):
+    if len(missing_sectors) > num_stocks:
+        max_iterator = num_stocks
+
+        
+    for x in range(0,max_iterator):
 
         # Find random stock belonging to that sector       
         stock = find_stock_in_sector( missing_sectors[x])
 
         found_stocks.append( stock )
-        found_sectors.append( missing_sectors[x] )
-
         sector_list.append( missing_sectors [x] )
         num_stocks -= 1
 
 
     # If there are still more stocks to find, use the least occuring sector
-
-    #print( "After the first find, this is how many are left ", num_stocks )
-    #print( "Stocks ", stocks )
-    #print( "Sectors ", sectors )
 
     
     if num_stocks != 0:
@@ -470,8 +463,6 @@ def add_stocks( num_stocks, tickers, sectors ):
 
 
             stock = find_stock_in_sector( least )        
-
-            found_sectors.append(least)
             found_stocks.append( stock )
        
     
@@ -479,7 +470,7 @@ def add_stocks( num_stocks, tickers, sectors ):
   
         
         
-    return found_stocks, found_sectors
+    return found_stocks
 
 def find_stock_in_sector( sector ):
     
