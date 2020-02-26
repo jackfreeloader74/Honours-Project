@@ -386,14 +386,16 @@ Current priorities:
   
 
 -------------------------------------------------------------------------------------------------------------------------------
+26/02/2020
+
+Completed testing of autoselection of stocks
+
+Added sortino Ratio option for portfolio generation. Finds the portfolio with the highest sortino ratio.
+Includes a new dropdown menu on index page
+      
+-------------------------------------------------------------------------------------------------------------------------------
 
 
-
-
-    
-    
-    
-    
     
     
     
