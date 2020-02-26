@@ -65,21 +65,27 @@
 		<div class="modal-body">
 			<div style="display: inline-flex;" class="input-group"> 
 				<ul class="list-group">
-					<li class="list-group-item">Apple = AAPL</li>
 					<li class="list-group-item">Alphabet (Google) = GOOG</li>
+					<li class="list-group-item">American National Insurance Company = ANAT</li>
+					<li class="list-group-item">Apple = AAPL</li>
 					<li class="list-group-item">Amazon = AMZN</li>
 					<li class="list-group-item">Coke = COKE</li>
+					<li class="list-group-item">Exxon Mobile = XOM</li>
 					<li class="list-group-item">Facebook = FB</li>
 					<li class="list-group-item">IBM = IBM</li>
 					<li class="list-group-item">Johnson & Johnson  = JNJ</li>
-					<li class="list-group-item">Exxon Mobile = XOM</li>
+					
+						
+				</ul>
+				<ul class="list-group">
+					<li class="list-group-item">J.P. Morgan  = JPM</li>
 					<li class="list-group-item">Microsoft = MSFT</li>
+					<li class="list-group-item">McDonalds = MCD</li>
+					<li class="list-group-item">Pfizer = PFE</li>
+					<li class="list-group-item">Nordstrom = JWN</li>
 					<li class="list-group-item">Starbucks = SBUX</li>
 					<li class="list-group-item">Tesla = TSLA</li>	
 					<li class="list-group-item">Twitter = TWTR</li>	
-				</ul>
-				<ul class="list-group">
-						
 					<li class="list-group-item">Walmart = WMT</li>
 				</ul>
 				
@@ -106,13 +112,20 @@
 								
 			<form name="myForm" id="theForm" action="/generatePortfolio" onsubmit="return validateForm()" method="post">
 				
+				<div>
+					<label id="checkBoxLabel" for="checkBox">Optimization Algorithm</label>
+				
+					<select name="algorithm" id = "myList">
+					   <option value = "1">Modern Portfolio Theory</option>
+					   <option value = "2">Post Modern Portfolio Theory</option>	  
+					</select>
+				</div>
 				
 				<label id="checkBoxLabel" for="checkBox">Find best risk-reward ratio</label>
 				
 				<label class="switch">
 					<input type="checkbox" for="checkBox" id="checkBox" name="checkBox">
 					<span class="slider round"></span>
-					
 				</label>
 				
 				<label id="specifyMinReturnLabel">Specify Minimum Return</label>
@@ -190,10 +203,6 @@
 				
 				
 				<button id="view_ticker_btn" type="button" class="btn-link" data-toggle="modal" data-target="#myModal">View Popular Stocks</button>
-	
-
-				
-			
 							
 			</div>		
 					
