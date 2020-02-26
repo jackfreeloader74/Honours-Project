@@ -12,7 +12,7 @@ import portfolio_lib as pl
 yahoo_up = True
 
 
-def OptimizePortfolio(tickers, user_expected_return, FindBestRatio, cash):
+def OptimizePortfolio(tickers, user_expected_return, FindBestRatio, cash, algorithm):
 
     stocks = tickers
     stocks = sorted(stocks)
@@ -43,10 +43,14 @@ def OptimizePortfolio(tickers, user_expected_return, FindBestRatio, cash):
     returns = data.pct_change()
 
     # Calculate mean daily return and covariance of daily returns
-    # These have nothing to do with portfolio weights so can do before the loop
     mean_daily_returns = returns.mean()
-    cov_matrix = returns.cov()
 
+    # If we are using PMPT, use downside derivation instead of just normal stdev
+    if algorithm == "PMPT":
+        for stock in stocks:
+           returns[returns[stock] > 0 ] = 0 
+    
+    cov_matrix = returns.cov()
 
     results = np.zeros((3, num_portfolios))
     currentSharpe = -4000

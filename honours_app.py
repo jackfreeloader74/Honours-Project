@@ -38,14 +38,14 @@ def ShowPortfolio():
     Risk = request.args['Risk']
     Weights = request.args['weights']
     tickers = request.args['tickers']
+    algorithm = request.args['algorithm']
     cash = request.args['cash']
     cash = "{:,.2f}".format(float(cash))
     share_volume_list = request.args['share_volume_list']
     sectors = request.args['sectors']
     
-    Return = round(Return, 3)
-    Sharpe= round(float(Return)/float(Risk),2)
-    Return = float(Return)*100
+    Ratio = round(float(Return)/float(Risk),2)
+    Return = round(float(Return)*100,3)
     
     # Convert weights from string back to a list
     Weights = process_weights( Weights )
@@ -60,13 +60,15 @@ def ShowPortfolio():
     
 
     table = render_table( stock_names, Weights, share_volume_list, cash, sectors)
-  
+
+    algorithm = calculate_ratio( algorithm )
    
     return render_template('portfolio_summary.html', name = 'Portfolio Weights',
                            Return = Return,
-                           Sharpe = Sharpe,
+                           Ratio = Ratio,
                            Risk= Risk,
                            table=table,
+                           algorithm=algorithm,
                            Cash=cash,    
                            url_pie ='static/images/pie_chart.png',
                            url_efficient ='static/images/efficient_frontier.png')
@@ -96,7 +98,9 @@ def generatePortfolio():
         BestRatio = False;
 
     
+
     # Obtain tickers from user input
+    algorithm = request.form['algorithm']
     expected_return = request.form['expectedReturn']
     _ticker1 = request.form['inputTicker1']
     _ticker2 = request.form['inputTicker2']
@@ -107,7 +111,9 @@ def generatePortfolio():
     _ticker7 = request.form['inputTicker7']
     _ticker8 = request.form['inputTicker8']
     portfolio_size = request.form['portfolioSize']
-
+    algorithm = calculate_algorithm( algorithm )
+   
+    
     cash = request.form['cash']
     if(cash == "" ):
         cash = 10000
@@ -115,24 +121,22 @@ def generatePortfolio():
     
     # Transorm tickers to appropriate format (Sort + Capitalize)
     tickers = [_ticker1,_ticker2, _ticker3, _ticker4, _ticker5
-               , _ticker6, _ticker7, _ticker8]
-
-    
+               , _ticker6, _ticker7, _ticker8]    
     tickers = filter_tickers( tickers, portfolio_size ) # Filter out empty inputs
 
-    
+
     # Calculate what sectors these belong to as well as the stocks official name
     sector_list = list(hp.find_sectors( tickers ) ) # What sectors do they belong to
-
-
-    tickers = auto_select_stocks( portfolio_size, tickers, sector_list) # Find stocks to add to portfolio
-
-    
-    sector_list = list(hp.find_sectors( tickers ) )
+    tickers = auto_select_stocks( portfolio_size, tickers, sector_list) # Find stocks to add to portfolio  
+    sector_list = list(hp.find_sectors( tickers ) ) # Find all the sectors again but with the newly added stocks
 
     
     # Perform Optimization 
-    Return, weights, Risk = hp.OptimizePortfolio(tickers, expected_return, BestRatio, cash)  
+    Return, weights, Risk = hp.OptimizePortfolio(tickers,
+                                                 expected_return,
+                                                 BestRatio,
+                                                 cash,
+                                                 algorithm)  
 
     
  
@@ -142,10 +146,12 @@ def generatePortfolio():
         # Optimization failed - Invalid ticker
         message = "Invalid Ticker Entered: %s" % weights     
         return redirect(url_for('.Invalid', message=message) )
+
     elif len(sector_list) == 1:
         # Optimization failed - Invalid ticker
         message = "Invalid Ticker Entered: %s" % sector_list     
         return redirect(url_for('.Invalid', message=message) )
+
     else:
         # Calculate the number of shares that can be bought
         share_volume_list = hp.CalculateShareVolume(tickers, weights, cash)
@@ -159,6 +165,7 @@ def generatePortfolio():
                                 Risk=Risk,
                                 cash=cash,
                                 sectors=str(sector_list),
+                                algorithm = algorithm,
                                 share_volume_list=str(share_volume_list),
                                 weights=str(weights),
                                 tickers=str(tickers)) )
@@ -339,9 +346,24 @@ def auto_select_stocks( size, tickers,  sectors ):
 
 
 
+def calculate_algorithm( algorithm ):
+
+    algorithm = int(algorithm)
+
+    if algorithm == 1:
+        return "MPT"
+    elif algorithm == 2:
+        return "PMPT"
+    else:
+        return "MPT"
 
 
+def calculate_ratio( algorithm ):
 
+    if algorithm == "MPT":
+        return "Sharpe"
+    else:
+        return "Sortino"
 
 
 if __name__ == "__main__":
