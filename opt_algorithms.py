@@ -11,28 +11,40 @@ import portfolio_lib as pl
 
 yahoo_up = True
 
+global_start_date = '01/01/2010'
+global_end_date = '01/01/2015'
 
 def OptimizePortfolio(tickers, user_expected_return, FindBestRatio, cash, algorithm):
 
     stocks = tickers
     stocks = sorted(stocks)
-    
-    
+
+    print( "Stocks ", stocks )
+
+    """ Read adj close data from api for each stock into 1 dataframe """
     if yahoo_up:
-        data = web.DataReader( stocks, data_source="yahoo", start='01/01/2018', end='01/01/2020')['Adj Close']
-        data.sort_index(inplace=True)
+        try:
+            data = web.DataReader( stocks, data_source="yahoo", start=global_start_date, end=global_end_date)['Adj Close']
+            data.sort_index(inplace=True)
+
+        except:
+            return False, "", None
     else:
         data = pd.read_csv('stocks.csv')
         data.sort_index(inplace=True)
         data = data.drop(columns=['Date'])
 
+    
   
-
+    
+    
     # Validate user provided tickers
     for ticker in stocks:
         if data[ticker].isnull().all():
             return False, ticker, None
 
+
+    data = data.dropna()
 
     # Start Optimization (MPT)
 
@@ -187,7 +199,6 @@ def share_price( ticker ):
 
     # Format date for the datareader
     date_formated = one.strftime("%m/%d/%Y")
-
  
 
     stocks = [ticker]
@@ -209,6 +220,7 @@ def plot_efficient_chart( pd, results):
     plt.cla()
     plt.clf()
     results_frame = pd.DataFrame(results.T, columns=['ret', 'stdev', 'sharpe'] )
+   
     plt.scatter(results_frame.stdev,results_frame.ret,c=results_frame.sharpe,cmap='RdYlBu')
     plt.colorbar()
     plt.savefig('static\\images\\efficient_frontier.png')
@@ -234,31 +246,96 @@ any more graphs and logic that involve the df should be done before this functio
 
 def plot_line_chart(data, tickers, weights, cash):
 
+    index = ['NYA']
+    
+    index_data = web.DataReader( index, data_source="yahoo", start=global_start_date, end=global_end_date)['Adj Close']
+    index_data.reset_index(inplace=True,drop=False)
+
+
+
+    data = web.DataReader( tickers, data_source="yahoo", start=global_start_date, end= global_end_date)['Adj Close']
+    
+
+    data = data.dropna()
+    data.reset_index(inplace=True,drop=False)
+
+    start_date = data['Date'].loc[data.first_valid_index()]
+    index = index_data.index[index_data['Date'] == start_date ].tolist()
+    index = index[0]
+
+
+    for i in range(0, len(index_data)):
  
+        if i < index:
+        
+            index_data = index_data.drop( [i])
+
+
+    index_data.reset_index(inplace=True,drop=False)
+
+
+    data['Total'] = 0
     i = 0
 
-    data['Total'] = data[tickers[0]]
-
-   
-
     for tick in tickers:
-        data[tick] = data[tick].pct_change()
-
-        data['Total'] = data['Total'] + ( weights[i]*cash*(1+data[tick]) )
-
+        data['Total'] = data['Total'] + data[tick] * weights[i]
         i += 1
-        
 
-    # Only record every 50 rows for graph
-    data = data.iloc[::50,:]
+    # Configure Index fund dataframe
+    index_data['pct_change'] = index_data['NYA'].pct_change()
+    index_data['Index_Total'] = 10000
+    index_data.loc[0,'Index_Total'] = 10000
 
+    #Configure Portfolio dataframe
+   
+    data['pct_change'] = data['Total'].pct_change()
+    data['Portfolio_Total'] = 10000
+    data.loc[0,'Portfolio_Total'] = 10000
+
+    for i in range(1, len(index_data) ):
+        index_data.loc[i, 'Index_Total'] = index_data.loc[i-1, 'Index_Total'] + index_data.loc[i, 'pct_change']*cash
+        data.loc[i, 'Portfolio_Total'] = data.loc[i-1, 'Portfolio_Total'] + data.loc[i, 'pct_change']*cash
+    
+    plot_frame = pd.DataFrame(columns=['Index Value' ] )
+
+    plot_frame['Index Value'] = index_data['Index_Total']
+    plot_frame['Portfolio Value'] = data['Portfolio_Total']
+
+    plot_frame.index = index_data['Date']
+
+
+
+    # Draw Graph
     plt.cla()
     plt.clf()
-    ax = data['Total'].plot(label='Portfolio',figsize=(16,8), title="Portfolio Performance")
-
+  
+    ax = plot_frame.plot(label='Portfolio',figsize=(16,8), title="Portfolio Performance")
     ax.set_ylabel("Portfolio Value ($)")
     
     plt.savefig('static\\images\\portfolio_value_chart.png', bbox_inches='tight')
+
+
+def calculateIndexValue( cash ):
+
+    stocks = ['NYA']
+
+    data = web.DataReader( stocks, data_source="yahoo", start='01/01/2010', end='01/01/2015')['Adj Close']
+    data.reset_index(inplace=True,drop=False)
+    
+    data['pct_change'] = data['NYA'].pct_change()
+
+    data['cash_value'] = 10000
+
+    data.loc[0,'cash_value'] = 10000
+
+    for i in range(1, len(data) ):
+        data.loc[i, 'cash_value'] = data.loc[i-1, 'cash_value'] + data.loc[i, 'pct_change']*cash
+
+    data['color'] = 'red'
+
+    return data['cash_value']
+
+
 
 
 
