@@ -23,19 +23,16 @@ def OptimizePortfolio(tickers, user_expected_return, FindBestRatio, cash, algori
 
     """ Read adj close data from api for each stock into 1 dataframe """
     if yahoo_up:
-        try:
-            data = web.DataReader( stocks, data_source="yahoo", start=global_start_date, end=global_end_date)['Adj Close']
-            data.sort_index(inplace=True)
+        #try:
+        data = web.DataReader( stocks, data_source="yahoo", start=global_start_date, end=global_end_date)['Adj Close']
+        data.sort_index(inplace=True)
 
-        except:
-            return False, "", None
+        #except:
+         #   return False, "", None
     else:
         data = pd.read_csv('stocks.csv')
         data.sort_index(inplace=True)
         data = data.drop(columns=['Date'])
-
-    
-  
     
     
     # Validate user provided tickers
@@ -263,6 +260,12 @@ def plot_line_chart(data, tickers, weights, cash):
     index = index_data.index[index_data['Date'] == start_date ].tolist()
     index = index[0]
 
+    """
+
+    Index fund df may not be the same length as the portfolio dataframe
+    Need to shorten index fund data so that it starts on the same date as the portfolio data
+    
+    """
 
     for i in range(0, len(index_data)):
  
@@ -273,6 +276,9 @@ def plot_line_chart(data, tickers, weights, cash):
 
     index_data.reset_index(inplace=True,drop=False)
 
+
+
+    #Calculate the total value of the stocks (not including cash)
 
     data['Total'] = 0
     i = 0
@@ -287,10 +293,12 @@ def plot_line_chart(data, tickers, weights, cash):
     index_data.loc[0,'Index_Total'] = 10000
 
     #Configure Portfolio dataframe
-   
+
     data['pct_change'] = data['Total'].pct_change()
-    data['Portfolio_Total'] = 10000
-    data.loc[0,'Portfolio_Total'] = 10000
+    data['Portfolio_Total'] = cash
+    data.loc[0,'Portfolio_Total'] = cash
+
+    # To monitor changes in cash, need to look at the previous row ( df.loc[i-1] ) and add it to the % change in cash
 
     for i in range(1, len(index_data) ):
         index_data.loc[i, 'Index_Total'] = index_data.loc[i-1, 'Index_Total'] + index_data.loc[i, 'pct_change']*cash
@@ -348,7 +356,7 @@ def round_list(param_list):
 
 def find_stock_names( tickers ):
 
-    data = pd.read_csv("C:\\Users\\marc.smith\\AppData\\Local\\Programs\\Python\\Python37-32\\static\\symbols\\industries.csv")
+    data = pd.read_csv("C:\\Users\\marc.smith\\AppData\\Local\\Programs\\Python\\Python37-32\\static\\symbols\\filtered_stocks.csv")
 
     stock_name_list = []
 
@@ -362,7 +370,7 @@ def find_stock_names( tickers ):
 
 def find_sectors( symbols ):
     
-    data = pd.read_csv("C:\\Users\\marc.smith\\AppData\\Local\\Programs\\Python\\Python37-32\\static\\symbols\\industries.csv")
+    data = pd.read_csv("C:\\Users\\marc.smith\\AppData\\Local\\Programs\\Python\\Python37-32\\static\\symbols\\filtered_stocks.csv")
 
     sector_list = []
     stock_name_list = []
@@ -555,7 +563,7 @@ def add_stocks( num_stocks, tickers, sectors ):
 
 def find_stock_in_sector( sector ):
     
-    data = pd.read_csv("C:\\Users\\marc.smith\\AppData\\Local\\Programs\\Python\\Python37-32\\static\\symbols\\industries.csv")
+    data = pd.read_csv("C:\\Users\\marc.smith\\AppData\\Local\\Programs\\Python\\Python37-32\\static\\symbols\\filtered_stocks.csv")
 
    
       
