@@ -394,18 +394,28 @@ Added sortino Ratio option for portfolio generation. Finds the portfolio with th
 Includes a new dropdown menu on index page
       
 -------------------------------------------------------------------------------------------------------------------------------
+02/03/2020
 
+Added new test plan. portfolio of 8 stocks trained using 5 year data (2010-2015) and train using a 1 year period 2015-2016)
+then calculate portfolios actual return and compare to its expected return. Do this for both MPT and PMPT.
 
-    
-    
-    
-    
+Do this over 3 sets of stocks then take an average.
 
+TEST2
+2 Portfolios - 1 all different sectors of stock another all the same sectors
+
+-------------------------------------------------------------------------------------------------------------------------------
+ 03/03/2020
+ 
+ Added an index fund value line to the portfolio value ( means portfolio value can be compared with an index fund NYA)
+-------------------------------------------------------------------------------------------------------------------------------
+
+ 04/03/2020
+
+Had to remove alot of stocks from the csv due to the csv stocks being from nasdaq and api from NYA.
 
 
 -------------------------------------------------------------------------------------------------------------------------------
-
-
 
 
 LIST OF PACKAGES REQUIRED TO RUN APPLICAITON
