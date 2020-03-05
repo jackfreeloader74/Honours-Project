@@ -46,7 +46,7 @@ def OptimizePortfolio(tickers, user_expected_return, FindBestRatio, cash, algori
     # Start Optimization (MPT)
 
     # Specify number of iterations to create
-    num_portfolios = 1500
+    num_portfolios = 15
 
     # convert daily stock prices into daily returns
     returns = data.pct_change()
@@ -122,7 +122,7 @@ def OptimizePortfolio(tickers, user_expected_return, FindBestRatio, cash, algori
 
     plot_pie_chart(labels, BestWeights)
 
-    plot_line_chart(data, stocks, BestWeights, float(cash) )
+    plot_line_chart( stocks, BestWeights, float(cash) )
   
     return BestReturn, BestWeights, currentRisk
 
@@ -241,45 +241,41 @@ def plot_pie_chart(labels, BestWeights):
 any more graphs and logic that involve the df should be done before this function call
 """
 
-def plot_line_chart(data, tickers, weights, cash):
+def plot_line_chart(tickers, weights, cash):
 
     index = ['NYA']
     
     index_data = web.DataReader( index, data_source="yahoo", start=global_start_date, end=global_end_date)['Adj Close']
+    index_data = index_data.dropna()
     index_data.reset_index(inplace=True,drop=False)
 
 
-
     data = web.DataReader( tickers, data_source="yahoo", start=global_start_date, end= global_end_date)['Adj Close']
-    
-
     data = data.dropna()
     data.reset_index(inplace=True,drop=False)
+    
+    
 
     start_date = data['Date'].loc[data.first_valid_index()]
-    index = index_data.index[index_data['Date'] == start_date ].tolist()
-    index = index[0]
+ 
+    
+    fund_start_index = index_data.loc[index_data['Date'] == start_date ]
+    print(  "Fund ", fund_start_index )
+    fund_start_index = fund_start_index.index[0]
+
 
     """
-
     Index fund df may not be the same length as the portfolio dataframe
-    Need to shorten index fund data so that it starts on the same date as the portfolio data
-    
+    Need to shorten index fund data so that it starts on the same date as the portfolio data    
     """
 
     for i in range(0, len(index_data)):
  
-        if i < index:
+        if i < fund_start_index:
         
             index_data = index_data.drop( [i])
 
-
-    index_data.reset_index(inplace=True,drop=False)
-
-
-
     #Calculate the total value of the stocks (not including cash)
-
     data['Total'] = 0
     i = 0
 
@@ -287,29 +283,51 @@ def plot_line_chart(data, tickers, weights, cash):
         data['Total'] = data['Total'] + data[tick] * weights[i]
         i += 1
 
+
     # Configure Index fund dataframe
     index_data['pct_change'] = index_data['NYA'].pct_change()
-    index_data['Index_Total'] = 10000
-    index_data.loc[0,'Index_Total'] = 10000
+    index_data['Index_Total'] = 0
+    index_data.reset_index(inplace=True,drop=False)
+    index_data.loc[0,'Index_Total'] = cash
+
+    print( index_data.head() )
 
     #Configure Portfolio dataframe
 
     data['pct_change'] = data['Total'].pct_change()
-    data['Portfolio_Total'] = cash
+    data['Portfolio_Total'] = 0
     data.loc[0,'Portfolio_Total'] = cash
+
+    print( data.head() )
 
     # To monitor changes in cash, need to look at the previous row ( df.loc[i-1] ) and add it to the % change in cash
 
-    for i in range(1, len(index_data) ):
+    graph_length = 0
+    
+    if len(index_data) > len(data):
+        graph_length = len(data)
+    else:
+        graph_length = len(index_data)
+
+    index_data.reset_index(inplace=True,drop=False)
+
+    for i in range(1, graph_length ):
         index_data.loc[i, 'Index_Total'] = index_data.loc[i-1, 'Index_Total'] + index_data.loc[i, 'pct_change']*cash
         data.loc[i, 'Portfolio_Total'] = data.loc[i-1, 'Portfolio_Total'] + data.loc[i, 'pct_change']*cash
     
     plot_frame = pd.DataFrame(columns=['Index Value' ] )
-
+    
     plot_frame['Index Value'] = index_data['Index_Total']
     plot_frame['Portfolio Value'] = data['Portfolio_Total']
-
     plot_frame.index = index_data['Date']
+    plot_frame = plot_frame[plot_frame['Index Value'] != 0]
+    
+    frame_diff = len(index_data) - len(data)
+
+    #plot_frame.drop(plot_frame.tail(frame_diff).index,inplace=True)
+   
+    
+   
 
 
 
@@ -391,16 +409,19 @@ def find_sectors( symbols ):
 
     return sector_list
 
+
+"""
+Plots and saves the Pie chart that shows sector breakdown
+"""
+
+
 def plot_sector_chart( sector_list, weights ):
 
     plt.cla()
-    plt.clf()
-
-    
+    plt.clf()   
    
     sector_list, sector_weights = calculate_sector_weights( sector_list, weights )
 
-   
     
     fig1, ax1 = plt.subplots()
     colors = ['yellowgreen', 'gold', 'lightskyblue', 'lightcoral', 'm', 'k', 'c', 'r']
