@@ -14,6 +14,8 @@ yahoo_up = True
 global_start_date = '01/01/2010'
 global_end_date = '01/01/2015'
 
+TRADING_DAYS = 252
+
 def OptimizePortfolio(tickers, user_expected_return, FindBestRatio, cash, algorithm):
 
     stocks = tickers
@@ -46,7 +48,8 @@ def OptimizePortfolio(tickers, user_expected_return, FindBestRatio, cash, algori
     # Start Optimization (MPT)
 
     # Specify number of iterations to create
-    num_portfolios = 15
+    #num_portfolios = 650000
+    num_portfolios = 30
 
     # convert daily stock prices into daily returns
     returns = data.pct_change()
@@ -76,11 +79,11 @@ def OptimizePortfolio(tickers, user_expected_return, FindBestRatio, cash, algori
         weights /= np.sum(weights)
 
         # anualised portfolio return
-        portfolio_return = round(np.sum(mean_daily_returns * weights) * 252, 2)
+        portfolio_return = round(np.sum(mean_daily_returns * weights) * TRADING_DAYS, 2)
 
         # annualised portfolio volatility
         portfolio_std_dev = round(np.sqrt( np.dot(weights.T, np.dot(cov_matrix, weights)))
-                              * np.sqrt(252),2)   
+                              * np.sqrt(TRADING_DAYS),2)   
 
         # Store results in an array
         results[0,i] = portfolio_return
@@ -92,7 +95,7 @@ def OptimizePortfolio(tickers, user_expected_return, FindBestRatio, cash, algori
    
         ## Find the portfolio with the best sharpe ratio
         if FindBestRatio:
-             if( results[2,i] > currentSharpe ):
+            if results[2,i] > currentSharpe:
                 currentSharpe = results[2,i]
                 BestWeights = round_list(weights)
                 BestReturn = portfolio_return
@@ -244,23 +247,30 @@ any more graphs and logic that involve the df should be done before this functio
 def plot_line_chart(tickers, weights, cash):
 
     index = ['NYA']
-    
+
+    # Index fund df
     index_data = web.DataReader( index, data_source="yahoo", start=global_start_date, end=global_end_date)['Adj Close']
     index_data = index_data.dropna()
     index_data.reset_index(inplace=True,drop=False)
 
 
+    # Portfolio df
     data = web.DataReader( tickers, data_source="yahoo", start=global_start_date, end= global_end_date)['Adj Close']
     data = data.dropna()
     data.reset_index(inplace=True,drop=False)
     
-    
 
-    start_date = data['Date'].loc[data.first_valid_index()]
- 
-    
+    # First stock in portfolio df
+    first_stock = tickers[0]
+    first_stock_data = web.DataReader( [ tickers[0]], data_source="yahoo", start=global_start_date, end= global_end_date)['Adj Close']
+    first_stock_data = data.dropna()
+    first_stock_data.reset_index(inplace=True,drop=False)
+
+
+    # Find the earliest date that our portfolio prices start at.
+
+    start_date = data['Date'].loc[data.first_valid_index()]    
     fund_start_index = index_data.loc[index_data['Date'] == start_date ]
-    print(  "Fund ", fund_start_index )
     fund_start_index = fund_start_index.index[0]
 
 
@@ -290,15 +300,17 @@ def plot_line_chart(tickers, weights, cash):
     index_data.reset_index(inplace=True,drop=False)
     index_data.loc[0,'Index_Total'] = cash
 
-    print( index_data.head() )
+    # Configure 1 stock dataframe
+    first_stock_data['pct_change'] = first_stock_data[first_stock].pct_change()
+    first_stock_data['Portfolio_Total'] = 0
+    first_stock_data.loc[0,'Portfolio_Total'] = cash
 
     #Configure Portfolio dataframe
-
     data['pct_change'] = data['Total'].pct_change()
     data['Portfolio_Total'] = 0
     data.loc[0,'Portfolio_Total'] = cash
 
-    print( data.head() )
+
 
     # To monitor changes in cash, need to look at the previous row ( df.loc[i-1] ) and add it to the % change in cash
 
@@ -309,28 +321,24 @@ def plot_line_chart(tickers, weights, cash):
     else:
         graph_length = len(index_data)
 
-    index_data.reset_index(inplace=True,drop=False)
-
+ 
     for i in range(1, graph_length ):
         index_data.loc[i, 'Index_Total'] = index_data.loc[i-1, 'Index_Total'] + index_data.loc[i, 'pct_change']*cash
         data.loc[i, 'Portfolio_Total'] = data.loc[i-1, 'Portfolio_Total'] + data.loc[i, 'pct_change']*cash
-    
+        first_stock_data.loc[i, 'Portfolio_Total'] = first_stock_data.loc[i-1, 'Portfolio_Total'] + first_stock_data.loc[i, 'pct_change']*cash
+
+
+    # Create the df that will be used to plot the line graph
     plot_frame = pd.DataFrame(columns=['Index Value' ] )
     
     plot_frame['Index Value'] = index_data['Index_Total']
     plot_frame['Portfolio Value'] = data['Portfolio_Total']
+    plot_frame[first_stock] = first_stock_data['Portfolio_Total']
+
     plot_frame.index = index_data['Date']
     plot_frame = plot_frame[plot_frame['Index Value'] != 0]
     
-    frame_diff = len(index_data) - len(data)
-
-    #plot_frame.drop(plot_frame.tail(frame_diff).index,inplace=True)
-   
     
-   
-
-
-
     # Draw Graph
     plt.cla()
     plt.clf()
