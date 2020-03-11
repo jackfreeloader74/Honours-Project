@@ -6,7 +6,7 @@ import opt_algorithms as hp
 import flask
 import pdfkit
 import ast
-
+import portfolio_lib as pl
 
 app = Flask(__name__)
 config = pdfkit.configuration(wkhtmltopdf='C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe')
@@ -43,6 +43,7 @@ def ShowPortfolio():
     cash = "{:,.2f}".format(float(cash))
     share_volume_list = request.args['share_volume_list']
     sectors = request.args['sectors']
+    portfolio_dividends = request.args['portfolio_dividends']
     
     Ratio = round(float(Return)/float(Risk),2)
     Return = round(float(Return)*100,3)
@@ -62,6 +63,8 @@ def ShowPortfolio():
     table = render_table( stock_names, Weights, share_volume_list, cash, sectors)
 
     algorithm = calculate_ratio( algorithm )
+
+    print( "HERE IT IS I GOT DIVIS ", portfolio_dividends )
    
     return render_template('portfolio_summary.html', name = 'Portfolio Weights',
                            Return = Return,
@@ -144,7 +147,11 @@ def generatePortfolio():
     if Return == False :
         
         # Optimization failed - Invalid ticker
-        message = "Invalid Ticker Entered: %s" % weights     
+        if weights == "":
+            message = "Something went wrong :("    
+        else:
+            message = "Invalid Ticker Entered: %s" % weights
+
         return redirect(url_for('.Invalid', message=message) )
 
     elif len(sector_list) == 1:
@@ -158,6 +165,9 @@ def generatePortfolio():
 
         # Make pie chart from the list of sectors
         hp.plot_sector_chart( sector_list, weights )
+
+        # Calculate Stock dividends
+        portfolio_dividends = pl.CalculateDividends( tickers,weights, cash)
         
         weights = list(weights)        
         return redirect(url_for('.ShowPortfolio',
@@ -166,6 +176,7 @@ def generatePortfolio():
                                 cash=cash,
                                 sectors=str(sector_list),
                                 algorithm = algorithm,
+                                portfolio_dividends = portfolio_dividends,
                                 share_volume_list=str(share_volume_list),
                                 weights=str(weights),
                                 tickers=str(tickers)) )

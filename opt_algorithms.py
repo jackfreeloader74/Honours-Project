@@ -12,9 +12,14 @@ import portfolio_lib as pl
 yahoo_up = True
 
 global_start_date = '01/01/2010'
-global_end_date = '01/01/2015'
-
+global_end_date = '01/01/2020'
 TRADING_DAYS = 252
+
+
+# Specify number of iterations to create
+#num_portfolios = 650000
+num_portfolios = 50
+
 
 def OptimizePortfolio(tickers, user_expected_return, FindBestRatio, cash, algorithm):
 
@@ -23,14 +28,12 @@ def OptimizePortfolio(tickers, user_expected_return, FindBestRatio, cash, algori
 
     print( "Stocks ", stocks )
 
-    """ Read adj close data from api for each stock into 1 dataframe """
+    """ Read adj close data from api for each stock into a dataframe """
     if yahoo_up:
-        #try:
+     
         data = web.DataReader( stocks, data_source="yahoo", start=global_start_date, end=global_end_date)['Adj Close']
         data.sort_index(inplace=True)
-
-        #except:
-         #   return False, "", None
+    
     else:
         data = pd.read_csv('stocks.csv')
         data.sort_index(inplace=True)
@@ -42,14 +45,8 @@ def OptimizePortfolio(tickers, user_expected_return, FindBestRatio, cash, algori
         if data[ticker].isnull().all():
             return False, ticker, None
 
-
+    stock_sharpe_list = find_stock_sharpes(data, stocks)
     data = data.dropna()
-
-    # Start Optimization (MPT)
-
-    # Specify number of iterations to create
-    #num_portfolios = 650000
-    num_portfolios = 30
 
     # convert daily stock prices into daily returns
     returns = data.pct_change()
@@ -90,7 +87,7 @@ def OptimizePortfolio(tickers, user_expected_return, FindBestRatio, cash, algori
         results[1,i] = portfolio_std_dev
 
         
-        # Store Sharpe Ratio  ( return / volatility )
+        # Store Sharpe/Sortino Ratio  ( return / volatility )
         results[2,i] = results[0,i] / results[1,i]
    
         ## Find the portfolio with the best sharpe ratio
@@ -117,11 +114,10 @@ def OptimizePortfolio(tickers, user_expected_return, FindBestRatio, cash, algori
 
     for item in stocks:
         labels.append( item )
-  
-    #labels = tickers[0],tickers[1],tickers[2], tickers[3]
+
 
     # Plot Graphs
-    plot_efficient_chart( pd, results)
+    plot_efficient_chart( results, BestReturn, currentRisk, stock_sharpe_list)
 
     plot_pie_chart(labels, BestWeights)
 
@@ -164,6 +160,51 @@ def CalculateShareVolume( tickers, weights, cash ):
 
     return share_list
 
+
+class StockSharpe:
+    risk = 0
+    exp_return = 0
+    ticker = ""
+
+
+def find_stock_sharpes( data, tickers):
+
+    stock_list = []
+
+
+    for tick in tickers:
+
+        sharpeObj = StockSharpe()
+
+        print( "Tick ", tick )
+        # convert daily stock prices into daily returns
+        returns = data[tick].pct_change()
+
+        # Calculate mean daily return and covariance of daily returns
+        mean_daily_returns = returns.mean()
+
+        
+        # anualised portfolio return
+        portfolio_return = round(np.sum(mean_daily_returns) * TRADING_DAYS, 2)
+
+        # annualised portfolio volatility
+        portfolio_std_dev = round(np.sqrt( mean_daily_returns)
+                              * np.sqrt(TRADING_DAYS),2 )
+
+
+        sharpeObj.risk =portfolio_std_dev
+
+        sharpeObj.exp_return = portfolio_return 
+        
+        sharpeObj.ticker = tick
+
+        
+        stock_list.append( sharpeObj )
+
+
+   
+
+    return stock_list
 
 
 """
@@ -215,15 +256,32 @@ def share_price( ticker ):
     return value
 
 
-def plot_efficient_chart( pd, results):
+def plot_efficient_chart( results, best_return, best_risk, stock_sharpe_list):
 
     plt.cla()
     plt.clf()
     results_frame = pd.DataFrame(results.T, columns=['ret', 'stdev', 'sharpe'] )
+
+    plt.xlabel('Volatility')
+    plt.ylabel('Returns')
+  
    
     plt.scatter(results_frame.stdev,results_frame.ret,c=results_frame.sharpe,cmap='RdYlBu')
     plt.colorbar()
+
+    # Best Sharpe Ratio
+    plt.scatter(best_risk, best_return, marker=(5,1,0),color='r',s= 50)
+
+
+    # Plot indivudual stock sharpe values
+    for obj in stock_sharpe_list:
+        plt.scatter( obj.risk, obj.exp_return, marker=(5,1,0), color='b', s=100)
+    
     plt.savefig('static\\images\\efficient_frontier.png')
+
+
+
+
 
 def plot_pie_chart(labels, BestWeights):
 
@@ -237,6 +295,8 @@ def plot_pie_chart(labels, BestWeights):
     ax1.axis('equal')
     plt.tight_layout()
     plt.savefig('static\\images\\pie_chart.png', bbox_inches='tight')
+
+
 
 
 
@@ -343,31 +403,11 @@ def plot_line_chart(tickers, weights, cash):
     plt.cla()
     plt.clf()
   
-    ax = plot_frame.plot(label='Portfolio',figsize=(16,8), title="Portfolio Performance")
+    ax = plot_frame.plot(label='Portfolio',figsize=(16,8), title="Past Portfolio Performance")
     ax.set_ylabel("Portfolio Value ($)")
     
     plt.savefig('static\\images\\portfolio_value_chart.png', bbox_inches='tight')
 
-
-def calculateIndexValue( cash ):
-
-    stocks = ['NYA']
-
-    data = web.DataReader( stocks, data_source="yahoo", start='01/01/2010', end='01/01/2015')['Adj Close']
-    data.reset_index(inplace=True,drop=False)
-    
-    data['pct_change'] = data['NYA'].pct_change()
-
-    data['cash_value'] = 10000
-
-    data.loc[0,'cash_value'] = 10000
-
-    for i in range(1, len(data) ):
-        data.loc[i, 'cash_value'] = data.loc[i-1, 'cash_value'] + data.loc[i, 'pct_change']*cash
-
-    data['color'] = 'red'
-
-    return data['cash_value']
 
 
 
