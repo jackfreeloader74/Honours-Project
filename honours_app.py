@@ -36,11 +36,11 @@ def ShowPortfolio():
 
     Return = float(request.args['Return'])
     Risk = request.args['Risk']
-    Weights = request.args['weights']
+    weights = request.args['weights']
     tickers = request.args['tickers']
     algorithm = request.args['algorithm']
     cash = request.args['cash']
-    cash = "{:,.2f}".format(float(cash))
+    cash_str = "{:,.2f}".format(float(cash))
     share_volume_list = request.args['share_volume_list']
     sectors = request.args['sectors']
     portfolio_dividends = request.args['portfolio_dividends']
@@ -49,7 +49,7 @@ def ShowPortfolio():
     Return = round(float(Return)*100,3)
     
     # Convert weights from string back to a list
-    Weights = process_weights( Weights )
+    weights = process_weights( weights )
 
     tickers = ast.literal_eval(tickers)
     sectors = ast.literal_eval(sectors)
@@ -60,19 +60,27 @@ def ShowPortfolio():
     stock_names = hp.find_stock_names( tickers )
     
 
-    table = render_table( stock_names, Weights, share_volume_list, cash, sectors)
+    table = render_table( stock_names, weights, share_volume_list, cash_str, sectors)
 
-    algorithm = calculate_ratio( algorithm )
+    
+   
 
-    print( "HERE IT IS I GOT DIVIS ", portfolio_dividends )
+    # Are we using Sharpe or Sortino?
+    algorithm = calculate_ratio( algorithm)
+
+    # Calculate Stock dividends
+    stock_dividend_list = pl.CalculateDividends( tickers, weights, cash)
+
+    dividend_table = pl.render_dividend_table( stock_dividend_list, tickers)
    
     return render_template('portfolio_summary.html', name = 'Portfolio Weights',
                            Return = Return,
                            Ratio = Ratio,
                            Risk= Risk,
                            table=table,
+                           dividend_table=dividend_table,
                            algorithm=algorithm,
-                           Cash=cash,    
+                           Cash=cash_str,    
                            url_pie ='static/images/pie_chart.png',
                            url_efficient ='static/images/efficient_frontier.png')
 
@@ -166,8 +174,7 @@ def generatePortfolio():
         # Make pie chart from the list of sectors
         hp.plot_sector_chart( sector_list, weights )
 
-        # Calculate Stock dividends
-        portfolio_dividends = pl.CalculateDividends( tickers,weights, cash)
+        
         
         weights = list(weights)        
         return redirect(url_for('.ShowPortfolio',
@@ -257,7 +264,7 @@ def render_table( tickers, weights, share_count, cash, sectors ):
 
     for tick in tickers:
 
-        html = html + '<tr> <th scope=\"row\">{}</th> <td id=\"t1\">{}</td> <td id=\"t1\">{}</td> <td id=\"w1\">{}</td> <td id=\"sv1\">{}</td> </tr>'.format(
+        html = html + '<tr> <th>{}</th> <td id=\"t1\">{}</td> <td id=\"t1\">{}</td> <td id=\"w1\">{}</td> <td id=\"sv1\">{}</td> </tr>'.format(
             i+1, tick, sectors[i],weights[i], share_count[i] )
         i += 1
 

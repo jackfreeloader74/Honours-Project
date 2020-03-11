@@ -270,13 +270,15 @@ def plot_efficient_chart( results, best_return, best_risk, stock_sharpe_list):
     plt.colorbar()
 
     # Best Sharpe Ratio
-    plt.scatter(best_risk, best_return, marker=(5,1,0),color='r',s= 50)
-
+    plt.scatter(best_risk, best_return, marker=(5,1,0),color='r',s= 100)
+    
 
     # Plot indivudual stock sharpe values
     for obj in stock_sharpe_list:
-        plt.scatter( obj.risk, obj.exp_return, marker=(5,1,0), color='b', s=100)
-    
+        
+        plt.annotate( "Stock", (obj.risk, obj.exp_return), xytext=(0,10))
+        plt.scatter( obj.risk, obj.exp_return, marker=(5,1,0), color='g', s=100)
+        
     plt.savefig('static\\images\\efficient_frontier.png')
 
 
