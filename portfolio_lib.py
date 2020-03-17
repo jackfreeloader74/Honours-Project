@@ -2,7 +2,9 @@ from dateutil.relativedelta import relativedelta
 from datetime import timedelta
 import datetime as dt
 import requests
-api_key = "2M6F7YVUOQBLY4WF"
+import time
+api_key1 = "2M6F7YVUOQBLY4WF"
+api_key2 = 'NEMPJL3V114R3DW8'
 
 #import opt_algorithms as hp
 
@@ -81,13 +83,21 @@ def CalculateDividends(tickers, weights, cash_investment):
     stock_dividend_list = []
 
     i = 0
-
+    api_count = 0
+    wait = True
     for stock in tickers:
 
-        url= "https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY_ADJUSTED&symbol={}&apikey={}".format( stock ,api_key )
+        if api_count > 4 and wait:
+            wait = False
+            time.sleep(60)
+
+        url= "https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY_ADJUSTED&symbol={}&apikey={}".format( stock ,api_key1 )
+    
+
         r = requests.get(url=url )
         data = r.json()
 
+      
         a = (data['Monthly Adjusted Time Series'])
         keys = a.keys()
 
@@ -108,8 +118,9 @@ def CalculateDividends(tickers, weights, cash_investment):
         # Calculate how many shares could have been bought at this time
         stock_weight = float(weights[i])/100
         stock_cash_investment = cash_investment*stock_weight
-        i += 1
 
+        i += 1
+        api_count += 1
         number_of_shares = stock_cash_investment / float(starting_close)
 
 
@@ -124,16 +135,10 @@ def CalculateDividends(tickers, weights, cash_investment):
                 dividend_value = float(a[key]['7. dividend amount'])
                 dividend_cash += (dividend_value * number_of_shares)
 
-
-        
-        print( "Stock ", stock, " Dividends ", dividend_cash )
-
         """
             Add to a list of stock dividends (to be displayed in a summary table)
         """
-
-       
-        
+ 
         stock_dividend_list.append( round(dividend_cash,2) )
 
     return stock_dividend_list
@@ -179,5 +184,12 @@ def render_dividend_table( stock_dividend_list, tickers ):
 
     html = html + "</tbody></table>"
 
-    return html
+
+    #start_date_formated = start_date.strftime("%m/%d/%Y")
+    #end_date_formated = end_date.strftime("%m/%d/%Y")
+
+    #dividend_dates = "{} to {}".format(start_date_formated, end_date_formated )
+    dividend_dates = ""
+    
+    return html, dividend_dates
         

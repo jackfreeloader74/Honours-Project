@@ -17,9 +17,9 @@ TRADING_DAYS = 252
 
 
 # Specify number of iterations to create
-#num_portfolios = 650000
-num_portfolios = 50
-
+num_portfolios = 650000
+#num_portfolios = 50
+#num_portfolios = 4000
 
 def OptimizePortfolio(tickers, user_expected_return, FindBestRatio, cash, algorithm):
 
@@ -53,6 +53,8 @@ def OptimizePortfolio(tickers, user_expected_return, FindBestRatio, cash, algori
 
     # Calculate mean daily return and covariance of daily returns
     mean_daily_returns = returns.mean()
+  
+
 
     # If we are using PMPT, use downside derivation instead of just normal stdev
     if algorithm == "PMPT":
@@ -176,7 +178,6 @@ def find_stock_sharpes( data, tickers):
 
         sharpeObj = StockSharpe()
 
-        print( "Tick ", tick )
         # convert daily stock prices into daily returns
         returns = data[tick].pct_change()
 
@@ -311,20 +312,26 @@ def plot_line_chart(tickers, weights, cash):
     index = ['NYA']
 
     # Index fund df
-    index_data = web.DataReader( index, data_source="yahoo", start=global_start_date, end=global_end_date)['Adj Close']
-    index_data = index_data.dropna()
-    index_data.reset_index(inplace=True,drop=False)
+    """try:
+        index_data = web.DataReader( index, data_source="yahoo", start=global_start_date, end='03/14/2019')['Adj Close']
+        index_data = index_data.dropna()
+        index_data.reset_index(inplace=True,drop=False)
+    except:
+        return False
+    """
 
-
+    index_data = pd.read_csv("C:\\Users\\marc.smith\\AppData\\Local\\Programs\\Python\\Python37-32\\index.csv")   
+    print( index_data.head() )
+    
     # Portfolio df
-    data = web.DataReader( tickers, data_source="yahoo", start=global_start_date, end= global_end_date)['Adj Close']
+    data = web.DataReader( tickers, data_source="yahoo", start=global_start_date, end= '03/14/2019')['Adj Close']
     data = data.dropna()
     data.reset_index(inplace=True,drop=False)
     
 
     # First stock in portfolio df
     first_stock = tickers[0]
-    first_stock_data = web.DataReader( [ tickers[0]], data_source="yahoo", start=global_start_date, end= global_end_date)['Adj Close']
+    first_stock_data = web.DataReader( [ tickers[0]], data_source="yahoo", start=global_start_date, end= '03/14/2020')['Adj Close']
     first_stock_data = data.dropna()
     first_stock_data.reset_index(inplace=True,drop=False)
 
@@ -332,7 +339,10 @@ def plot_line_chart(tickers, weights, cash):
     # Find the earliest date that our portfolio prices start at.
 
     start_date = data['Date'].loc[data.first_valid_index()]    
+    start_date = "2010-01-04"
+    print(" This is the start date ", start_date )
     fund_start_index = index_data.loc[index_data['Date'] == start_date ]
+    print( fund_start_index )
     fund_start_index = fund_start_index.index[0]
 
 

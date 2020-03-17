@@ -43,7 +43,7 @@ def ShowPortfolio():
     cash_str = "{:,.2f}".format(float(cash))
     share_volume_list = request.args['share_volume_list']
     sectors = request.args['sectors']
-    portfolio_dividends = request.args['portfolio_dividends']
+
     
     Ratio = round(float(Return)/float(Risk),2)
     Return = round(float(Return)*100,3)
@@ -57,27 +57,30 @@ def ShowPortfolio():
 
     # Table on summary page is of dynamic length so we create the html here
 
+    # Find the stocks names from the symbols AAPL -> Apple Inc
     stock_names = hp.find_stock_names( tickers )
     
-
+    # Render the portfolio weights table
     table = render_table( stock_names, weights, share_volume_list, cash_str, sectors)
-
-    
+ 
    
 
     # Are we using Sharpe or Sortino?
     algorithm = calculate_ratio( algorithm)
 
     # Calculate Stock dividends
-    stock_dividend_list = pl.CalculateDividends( tickers, weights, cash)
+    #stock_dividend_list = pl.CalculateDividends( tickers, weights, cash)
 
-    dividend_table = pl.render_dividend_table( stock_dividend_list, tickers)
+    stock_dividend_list = [ 4051.72, 0, 1078.34, 3019.38, 0, 0 , 0 , 0 ]
+    
+    dividend_table, dividend_dates = pl.render_dividend_table( stock_dividend_list, tickers)
    
     return render_template('portfolio_summary.html', name = 'Portfolio Weights',
                            Return = Return,
                            Ratio = Ratio,
                            Risk= Risk,
                            table=table,
+                          # dividend_dates = dividend_dates,
                            dividend_table=dividend_table,
                            algorithm=algorithm,
                            Cash=cash_str,    
@@ -174,8 +177,7 @@ def generatePortfolio():
         # Make pie chart from the list of sectors
         hp.plot_sector_chart( sector_list, weights )
 
-        
-        
+             
         weights = list(weights)        
         return redirect(url_for('.ShowPortfolio',
                                 Return=Return,
@@ -183,7 +185,6 @@ def generatePortfolio():
                                 cash=cash,
                                 sectors=str(sector_list),
                                 algorithm = algorithm,
-                                portfolio_dividends = portfolio_dividends,
                                 share_volume_list=str(share_volume_list),
                                 weights=str(weights),
                                 tickers=str(tickers)) )

@@ -14,10 +14,10 @@ TEST1 3 Years    2012-2015    2015-2016
 6 monthes Jan - June
 
 """
+
 stocks = ['BGS', 'CNXN', 'HLF', 'MLAB', 'MOMO', 'SU', 'VRNS', 'Y']
 mpt_weights = [ 0.009, 0.188, 0.039, 0.001, 0.392, 0.022, 0.004, 0.345 ]
 exp_return = 23.19
-
 
 print( sum(mpt_weights))
 
@@ -30,7 +30,8 @@ time_frame = [ 1, 2, 3, 4, 5, 6 ]
 
 algorithm_weights = [mpt_weights] #, pmpt_weights ]
 
-print( "Algorithm 5 year span" )
+print( "1 year time frame" )
+
 for w in algorithm_weights:
 
     avg_first = 0
@@ -43,8 +44,8 @@ for w in algorithm_weights:
     
     for year in time_frame:
 
-        start_date = "{}/01/2015".format( year )
-        end_date = "{}/01/2019".format( year )
+        start_date = "{}/01/2010".format( year )
+        end_date = "{}/01/2015".format( year )
 
         try:
             data = web.DataReader( stocks, data_source="yahoo", start=start_date, end=end_date)['Adj Close']
@@ -92,8 +93,8 @@ for w in algorithm_weights:
     print("Average year Realised Return %", avg_realised_return/6 )
     print("Average year Expected Future Value ", avg_expected_value/6 )
     print("Average year Realised Value ", avg_end_val/6 )
-    #print("Average year Discrepancy % ", avg_discrep_perc/6 )
-    #print("Average year Discrepancy ",  (avg_expected_value - avg_end_val)/6 )
+    print("Average year Discrepancy % ", avg_discrep_perc/6 )
+    print("Average year Discrepancy ",  (avg_expected_value - avg_end_val)/6 )
 
 
 # Only record every 50 rows for graph
