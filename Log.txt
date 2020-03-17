@@ -415,6 +415,14 @@ TEST2
 Had to remove alot of stocks from the csv due to the csv stocks being from nasdaq and api from NYA.
 
 
+10/03/20
+
+Finished algorithm comparison testing
+-------------------------------------------------------------------------------------------------------------------------------
+
+17/03/20
+
+Finished sector diversification testing
 -------------------------------------------------------------------------------------------------------------------------------
 
 
