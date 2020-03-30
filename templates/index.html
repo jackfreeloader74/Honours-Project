@@ -5,15 +5,7 @@
     <title>Portfolio Optimization Tool</title>
  
 	<link href="static\portfolio.css" rel="stylesheet">
-	<!--<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
 	
-	<script src="../static/js/jquery-1.11.2.js"></script>
-    <script src="../static/js/Portfolio.js"></script>
-	<script src = "https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-	-->
 	
 	<link href="../static/navbar.css" rel="stylesheet">
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
@@ -52,11 +44,14 @@
       </div>
     </nav>
 	
+	
+	
+	<!-- Stock list popup -->
 	<div class="modal" id="MyModal" tabindex="-1" role="dialog">
 		<div class="modal-dialog" role="document">
     <div class="modal-content">
 		<div class="modal-header">
-			<h5 class="modal-title">TOP 100 NASDAQ Stocks</h5>
+			<h5 class="modal-title">Top Stocks and Symbols</h5>
 			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 				<span aria-hidden="true">&times;</span>
 			</button>
@@ -100,6 +95,43 @@
 	</div>
 	
 	
+	<!-- Help Popup -->	
+	<div class="modal" id="helpModal" tabindex="-1" role="dialog">
+		<div class="modal-dialog" role="document">
+    <div class="modal-content">
+		<div class="modal-header">
+			<h5 class="modal-title">Help Section</h5>
+			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+		</div>
+		
+		<div class="modal-body">
+			<div style="display: inline-flex;" class="input-group"> 
+				<ul class="list-group">
+					<li  class="list-group-item">Find best risk to reward ratio</li>
+					<li id="parDesc2" style="font-size: 20px" class="list-group-item">This tells the application to find the portfolio with the best
+					annual expected rate of return with regards to its volatility. If the selected algorithm is Modern Portfolio Theory then the application 
+					will find the portfolio with the highest Sharpe ratio. If the selected algorithm is Post Modern Portfolio Theory then the application will find the 
+					portfolio with the highest Sortino ratio.</li>	
+						
+					<li  class="list-group-item">Specify minimum rate of return</li>
+					<li id="parDesc2" style="font-size: 20px" class="list-group-item">Specifying the minimum rate of return tells the application to 
+					find the portfolio with the lowest volatility that also meets or exceeds your provided return. For example if you provide a minimum rate of 
+					return of 20% then the application finds all possible portfolios that have an expected return of at least 20% and from there it chooses the portfolio
+					with the lowest volatility. If the application cannot find a portfolio that meets your expected return then it will display a warning.</li>
+						
+				</ul>	
+			</div>
+		</div>
+			  <div class="modal-footer">
+				<!--<button type="button" class="btn btn-primary">Save changes</button>-->
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+			  </div>
+			</div>
+		</div>
+	</div>
+	
  
     <div class="container">
         
@@ -117,37 +149,39 @@
 				
 					<select name="algorithm" id = "myList">
 					   <option value = "1">Modern Portfolio Theory</option>
-					   <option value = "2">Post Modern Portfolio Theory</option>	  
+					   <option id="pmpt" value = "2">Post Modern Portfolio Theory</option>	  
 					</select>
 				</div>
 				
-				<label id="checkBoxLabel" for="checkBox">Find best risk-reward ratio</label>
+				<div id="mar_div">
+					<label id="minimumAdjustedReturnLabel" for="expectedReturn">Minimum Adjusted Return</label>
 				
-				<label class="switch">
-					<input type="checkbox" for="checkBox" id="checkBox" name="checkBox">
-					<span class="slider round"></span>
-				</label>
+					<select name="mar_value">
+					    <option value = "1">0%</option>
+					    <option value = "2">1%</option>
+					    <option value = "3">2%</option>
+						<option value = "4">5%</option>					   
+					</select>
 				
-				<label id="specifyMinReturnLabel">Specify Minimum Return</label>
-				
-				
-				<div class="form-group">
-					<label id="expectedReturnLabel" for="expectedReturn">Expected Return</label>
-					<input type="name" name="expectedReturn" required="false" id="expectedReturn" class="form-control" placeholder="Expected Return (%)">
-					<small id="returnHelp" class="form-text text-muted">Enter the minimum rate of return for your desired portfolio.</small>
 				</div>
 				
 				<div class="form-group">
 					<label id="portfolioSizeLabel" for="expectedReturn">Portfolio Size</label>
+					<small id="returnHelp" class="form-text text-muted">(Enter the number of companies you wish to invest in)</small>
 					<input type="name" name="portfolioSize" required="false" id="portfolioSize" class="form-control" placeholder="Portfolio Size" required="false">
-					<small id="returnHelp" class="form-text text-muted">Enter the number of companies you wish to invest in</small>
-				</div>
+					
+				</div>				
+				
 					
 	
 			<label id="portfolioSizeLabel" for="expectedReturn">Stock Selection</label>
 				
 			<small id="emailHelp" class="form-text text-muted">	(Enter the stocks that you want to have in your portfolio in ticker form. E.g. Amazon = AMZN.)</small>
-				
+			
+			<div><small id="emailHelp" class="form-text text-muted">If your portfolio size is greater than the number of stocks you have 
+				provided then the application will autoselect some for you.</small>
+			</div>
+			
 			<div id="stockInput">
 				
 				
@@ -206,9 +240,31 @@
 							
 			</div>		
 					
+				
+				<label id="checkBoxLabel" for="checkBox">Find best risk-reward ratio</label>
+				
+				<label class="switch">
+					<input type="checkbox" for="checkBox" id="checkBox" name="checkBox">
+					<span class="slider round"></span>
+				</label>
+				
+				<label id="specifyMinReturnLabel">Specify Minimum Return
+					<button style="padding-left: 60px"id="view_help_btn" type="button" class="btn-link" data-toggle="modal" data-target="#helpModal">Help?</button>
+				</label>
+				
+				<div class="form-group">
+					<label id="expectedReturnLabel" for="expectedReturn">Expected Return</label>
+					<small id="returnHelpSmall" class="form-text text-muted">(Enter the minimum rate of return for your desired portfolio)</small>
+					<input type="name" name="expectedReturn" required="false" id="expectedReturn" class="form-control" placeholder="Expected Return (%)">
+					
+				</div>
+				
+				
+				
+				
 				<div class="cash-group" style="padding-top: 40px;">
 					<label id="portfolioSizeLabel" for="expectedReturn">Cash Investment</label>
-				<small id="emailHelp" class="form-text text-muted">	(Enter the cash value of your portfolio.)</small>
+				<small id="emailHelp" class="form-text text-muted">	(Enter the cash value of your portfolio)</small>
 					<input type="name"  name="cash"  id="cash" class="form-control" placeholder="Cash Investment (£)" required="false">
 				</div>
 					
