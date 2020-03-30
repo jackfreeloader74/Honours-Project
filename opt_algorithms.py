@@ -12,22 +12,24 @@ import portfolio_lib as pl
 yahoo_up = True
 
 global_start_date = '01/01/2010'
-global_end_date = '01/01/2020'
+global_end_date = '01/01/2015'
 TRADING_DAYS = 252
 
 
 # Specify number of iterations to create
-num_portfolios = 650000
-#num_portfolios = 50
-#num_portfolios = 4000
 
-def OptimizePortfolio(tickers, user_expected_return, FindBestRatio, cash, algorithm):
+num_portfolios = 85000
+#num_portfolios = 50
+
+
+def OptimizePortfolio(tickers, user_expected_return, FindBestRatio, cash, algorithm, mar_value):
 
     stocks = tickers
     stocks = sorted(stocks)
 
     print( "Stocks ", stocks )
-
+    print( "Mar Val", mar_value )
+    
     """ Read adj close data from api for each stock into a dataframe """
     if yahoo_up:
      
@@ -56,17 +58,20 @@ def OptimizePortfolio(tickers, user_expected_return, FindBestRatio, cash, algori
   
 
 
-    # If we are using PMPT, use downside derivation instead of just normal stdev
+    # If we are using PMPT, use downside derivation instead of just normal stdev.
+    # The downside derivation (MAR) is defined by the user and held in variable mar_value
     if algorithm == "PMPT":
         for stock in stocks:
-           returns[returns[stock] > 0 ] = 0 
+           returns[returns[stock] > mar_value ] = 0 
     
     cov_matrix = returns.cov()
 
     results = np.zeros((3, num_portfolios))
     currentSharpe = -4000
+    currentWorstSharpe = 4000
     lowest_current_risk = 4000
     BestReturn = 0
+    
     
     print("Starting optimization...")
 
@@ -99,6 +104,12 @@ def OptimizePortfolio(tickers, user_expected_return, FindBestRatio, cash, algori
                 BestWeights = round_list(weights)
                 BestReturn = portfolio_return
                 currentRisk = round(results[1,i],2)
+
+            if results[2,i] < currentWorstSharpe:
+
+                currentWorstSharpe = results[2,i]
+                WorstWeights = round_list(weights)
+                WorstReturn = portfolio_return
             
         else:
             ## Find the portfolio with the expected return that is greater than or equal to the specified return
@@ -111,6 +122,9 @@ def OptimizePortfolio(tickers, user_expected_return, FindBestRatio, cash, algori
                 BestReturn = portfolio_return
                 currentRisk = round(results[1,i],2)
 
+
+    print( "Best Weights ", BestWeights, " Expected return ", BestReturn , " Sharpe: ", currentSharpe)
+    print( "Worst Weights ", WorstWeights, " Expected return ", WorstReturn , " Sharpe ", currentWorstSharpe )
 
     labels = []
 
@@ -312,16 +326,12 @@ def plot_line_chart(tickers, weights, cash):
     index = ['NYA']
 
     # Index fund df
-    """try:
-        index_data = web.DataReader( index, data_source="yahoo", start=global_start_date, end='03/14/2019')['Adj Close']
-        index_data = index_data.dropna()
-        index_data.reset_index(inplace=True,drop=False)
-    except:
-        return False
-    """
+   
 
+    # The data for NYA stock would change between API calls? Some days were missing and different etc...
+    # Best solution for this was to read the correct values from an index fund
     index_data = pd.read_csv("C:\\Users\\marc.smith\\AppData\\Local\\Programs\\Python\\Python37-32\\index.csv")   
-    print( index_data.head() )
+ 
     
     # Portfolio df
     data = web.DataReader( tickers, data_source="yahoo", start=global_start_date, end= '03/14/2019')['Adj Close']

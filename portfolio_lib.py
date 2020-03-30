@@ -185,11 +185,57 @@ def render_dividend_table( stock_dividend_list, tickers ):
     html = html + "</tbody></table>"
 
 
-    #start_date_formated = start_date.strftime("%m/%d/%Y")
-    #end_date_formated = end_date.strftime("%m/%d/%Y")
-
-    #dividend_dates = "{} to {}".format(start_date_formated, end_date_formated )
     dividend_dates = ""
     
     return html, dividend_dates
+
+
+
+# Based on the int value from the dropdown, find what MAR they selected 
+
+def calculate_mar( mar_dropdown_val ):
+
+    mar_dropdown_val = int(mar_dropdown_val )
+
+    mar_value = 0
+
+    if mar_dropdown_val == 1:
+        # 0%
+        mar_value = 0
+
+    elif mar_dropdown_val == 2:
+
+        #1%
+        mar_value = 0.01
+
+    elif mar_dropdown_val == 3:
+        # 2%
+        mar_value = 0.02
+    else:
+        # 5%
+        mar_value = 0.05
+
+    return mar_value
+
+# Based on the int value from the dropdown, find what algorithm they selected    
+def calculate_algorithm( algorithm ):
+
+    algorithm = int(algorithm)
+
+    if algorithm == 1:
+        return "MPT"
+    elif algorithm == 2:
+        return "PMPT"
+    else:
+        return "MPT"
+
+
+def calculate_ratio( algorithm ):
+
+    if algorithm == "MPT":
+        return "Sharpe"
+    else:
+        return "Sortino"
+
+
         

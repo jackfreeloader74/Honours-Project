@@ -66,12 +66,13 @@ def ShowPortfolio():
    
 
     # Are we using Sharpe or Sortino?
-    algorithm = calculate_ratio( algorithm)
+    algorithm = pl.calculate_ratio( algorithm)
 
     # Calculate Stock dividends
-    #stock_dividend_list = pl.CalculateDividends( tickers, weights, cash)
+    stock_dividend_list = pl.CalculateDividends( tickers, weights, cash)
 
-    stock_dividend_list = [ 4051.72, 0, 1078.34, 3019.38, 0, 0 , 0 , 0 ]
+    # Backup for when API limit is reached
+    #stock_dividend_list = [ 4051.72, 0, 1078.34, 3019.38, 0, 0 , 0 , 0 ]
     
     dividend_table, dividend_dates = pl.render_dividend_table( stock_dividend_list, tickers)
    
@@ -115,6 +116,7 @@ def generatePortfolio():
 
     # Obtain tickers from user input
     algorithm = request.form['algorithm']
+    mar_value = request.form['mar_value']
     expected_return = request.form['expectedReturn']
     _ticker1 = request.form['inputTicker1']
     _ticker2 = request.form['inputTicker2']
@@ -125,12 +127,15 @@ def generatePortfolio():
     _ticker7 = request.form['inputTicker7']
     _ticker8 = request.form['inputTicker8']
     portfolio_size = request.form['portfolioSize']
-    algorithm = calculate_algorithm( algorithm )
-   
+
+    algorithm = request.form['algorithm']
+    mar_value = request.form['mar_value']
+    algorithm = pl.calculate_algorithm( algorithm )
+    mar_value = pl.calculate_mar( mar_value )
     
     cash = request.form['cash']
     if(cash == "" ):
-        cash = 10000
+        cash = 10000 # Default cash to 10,000
 
     
     # Transorm tickers to appropriate format (Sort + Capitalize)
@@ -150,7 +155,8 @@ def generatePortfolio():
                                                  expected_return,
                                                  BestRatio,
                                                  cash,
-                                                 algorithm)  
+                                                 algorithm,
+                                                 mar_value)  
 
     
  
@@ -365,24 +371,9 @@ def auto_select_stocks( size, tickers,  sectors ):
 
 
 
-def calculate_algorithm( algorithm ):
-
-    algorithm = int(algorithm)
-
-    if algorithm == 1:
-        return "MPT"
-    elif algorithm == 2:
-        return "PMPT"
-    else:
-        return "MPT"
 
 
-def calculate_ratio( algorithm ):
 
-    if algorithm == "MPT":
-        return "Sharpe"
-    else:
-        return "Sortino"
 
 
 if __name__ == "__main__":
