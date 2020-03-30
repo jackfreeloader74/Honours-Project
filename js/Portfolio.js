@@ -8,15 +8,14 @@ $(function() {
 
 function init()
 {
-		
+	$("#returnHelpSmall").hide();	
 	$("#expectedReturn").hide();
 	$("#expectedReturnLabel").hide();
-	$("#returnHelp").hide();
+	
 	$("#expectedReturn").prop('required', false );
 	$("#cash").prop('required', false );
 	
-	//$("#span1").hide();
-	//$("#span1").hide()
+	$("#mar_div").hide();
 	
 	//$("#loader").hide();
 	$("#specifyMinReturnLabel").css("font-weight", "normal")
@@ -34,6 +33,7 @@ function init()
 
 	return true;
 };
+
 
 
 
@@ -149,7 +149,7 @@ $(function() {
 		if( $("#checkBox").is(":checked") ){
 			$("#expectedReturn").show();
 			$("#expectedReturnLabel").show();
-			$("#returnHelp").show();
+			$("#returnHelpSmall").show();
 			
 			$("#specifyMinReturnLabel").css("font-weight", "bold")
 			$("#checkBoxLabel").css("font-weight", "normal")
@@ -162,7 +162,7 @@ $(function() {
 		{
 			$("#expectedReturn").hide();
 			$("#expectedReturnLabel").hide();
-			$("#returnHelp").hide();
+			$("#returnHelpSmall").hide();
 			$("#expectedReturn").val("")
 			$("#expectedReturn").prop('required', false );
 			
@@ -187,13 +187,57 @@ $(function() {
 	
 });
 
+
+
+$(function() {
+	$("#view_ticker_btn").click(function() {
+		
+		$(document).ready(function() {
+			$("#MyModal").modal();
+		});
+	});
+	
+});
+
+ 
+ 
+/* Create a listener for when the user changes the value of the algorithm dropdown menu */
+ 
+$(function() {
+	$("#myList").change(function() {
+		var selectedVal = $(this).find(':selected').val();
+		
+		
+		if( selectedVal == 1 )
+		{
+			$("#mar_div").hide();
+		}
+		else if( selectedVal == 2 )
+		{
+			$("#mar_div").show();
+		}
+	});
+	
+});
+ 
+
+$(function() {
+	$("#view_help_btn").click(function() {
+		
+		$(document).ready(function() {
+			$("#helpModal").modal();
+		});
+	});
+	
+});
+ 
  
 
 $(function() {
 	
 	$("#preset").click(function() {
 		
-		$("#portfolioSize").val("8");
+		$("#portfolioSize").val("4");
 		$("#inputTicker1").val("AAPL");
 		$("#inputTicker2").val("AMZN");
 		$("#inputTicker3").val("TSLA");
@@ -202,6 +246,49 @@ $(function() {
 		$("#inputTicker6").val("SBUX");
 		$("#inputTicker7").val("IBM");
 		$("#inputTicker8").val("MSFT");
+		$("#cash").val("10000");
+		
+		$("#appointmentEditDialog").dialog("open",true);
+	});
+});
+
+
+$(function() {
+	
+	$("#mpt_dropdown").click(function() {
+		
+		mpt = $("#mpt_dropdown").text()
+		$("#dropdownBtn").text(mpt);
+	});
+});
+
+
+
+$(function() {
+	
+	$("#pmpt_dropdown").click(function() {
+		
+		mpt = $("#pmpt_dropdown").text()
+		$("#dropdownBtn").text(mpt);
+	});
+});
+
+
+
+
+$(function() {
+	
+	$("#preset2").click(function() {
+		
+		$("#portfolioSize").val("8");
+		$("#inputTicker1").val("AAPL");
+		$("#inputTicker2").val("AMZN");
+		$("#inputTicker3").val("TSLA");
+		$("#inputTicker4").val("XOM");
+		$("#inputTicker5").val("ATLO");
+		$("#inputTicker6").val("GBT");
+		$("#inputTicker7").val("ADM");
+		$("#inputTicker8").val("XTLB");
 		$("#cash").val("10000");
 		
 		$("#appointmentEditDialog").dialog("open",true);
