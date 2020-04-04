@@ -12,13 +12,13 @@ import portfolio_lib as pl
 yahoo_up = True
 
 global_start_date = '01/01/2010'
-global_end_date = '01/01/2015'
+global_end_date = '01/01/2020'
 TRADING_DAYS = 252
 
 
 # Specify number of iterations to create
 
-num_portfolios = 85000
+num_portfolios = 25000
 #num_portfolios = 50
 
 

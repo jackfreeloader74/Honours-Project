@@ -49,7 +49,7 @@ def ShowPortfolio():
     Return = round(float(Return)*100,3)
     
     # Convert weights from string back to a list
-    weights = process_weights( weights )
+    weights = pl.process_weights( weights )
 
     tickers = ast.literal_eval(tickers)
     sectors = ast.literal_eval(sectors)
@@ -61,7 +61,7 @@ def ShowPortfolio():
     stock_names = hp.find_stock_names( tickers )
     
     # Render the portfolio weights table
-    table = render_table( stock_names, weights, share_volume_list, cash_str, sectors)
+    table = pl.render_weights_table( stock_names, weights, share_volume_list, cash_str, sectors)
  
    
 
@@ -74,14 +74,18 @@ def ShowPortfolio():
     # Backup for when API limit is reached
     #stock_dividend_list = [ 4051.72, 0, 1078.34, 3019.38, 0, 0 , 0 , 0 ]
     
-    dividend_table, dividend_dates = pl.render_dividend_table( stock_dividend_list, tickers)
-   
+    if stock_dividend_list:
+        dividend_table = pl.render_dividend_table( stock_dividend_list, tickers)
+    else:
+        # In case dividend api call failed
+        dividend_table = ""
+
+        
     return render_template('portfolio_summary.html', name = 'Portfolio Weights',
                            Return = Return,
                            Ratio = Ratio,
                            Risk= Risk,
                            table=table,
-                          # dividend_dates = dividend_dates,
                            dividend_table=dividend_table,
                            algorithm=algorithm,
                            Cash=cash_str,    
@@ -141,12 +145,12 @@ def generatePortfolio():
     # Transorm tickers to appropriate format (Sort + Capitalize)
     tickers = [_ticker1,_ticker2, _ticker3, _ticker4, _ticker5
                , _ticker6, _ticker7, _ticker8]    
-    tickers = filter_tickers( tickers, portfolio_size ) # Filter out empty inputs
+    tickers = pl.filter_tickers( tickers, portfolio_size ) # Filter out empty inputs
 
 
     # Calculate what sectors these belong to as well as the stocks official name
     sector_list = list(hp.find_sectors( tickers ) ) # What sectors do they belong to
-    tickers = auto_select_stocks( portfolio_size, tickers, sector_list) # Find stocks to add to portfolio  
+    tickers = pl.auto_select_stocks( portfolio_size, tickers, sector_list) # Find stocks to add to portfolio  
     sector_list = list(hp.find_sectors( tickers ) ) # Find all the sectors again but with the newly added stocks
 
     
@@ -213,34 +217,27 @@ def generatePDF():
     expected_return_str = request.args.get('Return')
     risk = request.args.get('Risk')
     table = request.args.get('table')
+    dividend_details = request.args.get('dividends')
+    cash = request.args.get('cash')
 
 
     # Need to remove the % so the sharpe ratio can be calcluated
     exp_return = float(expected_return_str.replace("%", "")) 
-    
     Sharpe = round((exp_return/100)/float(risk),2)
     
-    tickers = request.args.get('Tickers')
-    weights = request.args.get('Weights')
-
-
-    # Convert tickers and weights from string format to arrays
-    tickers = ast.literal_eval(tickers);
-    weights = ast.literal_eval(weights);
-
-
-   
-
     
     # Render html file with all required data
     rendered = render_template('portfolio_pdf.html',
                                Return=expected_return_str,
                                Risk=risk,
                                Sharpe=Sharpe,
+                               cash=cash,
                                url_pie='C:/Users/marc.smith/AppData/Local/Programs/Python/Python37-32/static/images/pie_chart.png',
+                               sector_pie='C:/Users/marc.smith/AppData/Local/Programs/Python/Python37-32/static/images/sector_makeup.png',
                                url_efficient='C:/Users/marc.smith/AppData/Local/Programs/Python/Python37-32/static/images/efficient_frontier.png',
                                url_performance='C:/Users/marc.smith/AppData/Local/Programs/Python/Python37-32/static/images/portfolio_value_chart.png',
-                               table=table)
+                               table=table,
+                               dividends=dividend_details)
 
 
 
@@ -251,127 +248,6 @@ def generatePDF():
 
 
     return "PDF Generated successfully"
-
-
-
-
-
-    
-
-def render_table( tickers, weights, share_count, cash, sectors ):
-
-    i = 0
-   
-    html = '''<table class=\"table table\"><thead><tr><th scope=\"col\">#</th>
-            <th scope=\"col\">Stock</th>
-            <th scope=\"col\">Sector</th>
-            <th scope=\"col\">Weight (%)</th>
-            <th scope=\"col\">Share Count</th>
-            </tr></thead><tbody>'''.format(cash)   
-
-    for tick in tickers:
-
-        html = html + '<tr> <th>{}</th> <td id=\"t1\">{}</td> <td id=\"t1\">{}</td> <td id=\"w1\">{}</td> <td id=\"sv1\">{}</td> </tr>'.format(
-            i+1, tick, sectors[i],weights[i], share_count[i] )
-        i += 1
-
-
-    html = html + "</tbody></table>"
-				
-    return html
-
-
-def process_weights( Weights ):
-
-    # url_for converts the array to a string, literal_eval converts it back to an array
-    Weights = ast.literal_eval(Weights)
-    Weights = [ weight * 100 for weight in Weights ]
-
-    # Round weights to 2 dec places, maybe should do this in OPT code?
-    Weights = [ round(weight,3) for weight in Weights ]
-
-    return Weights
-
-def tickers_contain_duplicates( tickers ):
-
-    i = 0
-    for item in tickers:
-     
-        ticker = item
-	   
-	# Remove element
-        tickers.split(i,1)
-	   
-	#Check if string is still in array
-	   
-        if item in tickers and ticker != "":   
-            return True	   
-        else:   
-            tickers.split(i, 0, ticker)
-            i += 1
-   
-   
-    return False
-
-
-
-def invalid_return(expected_return):
-
-    expected_return = float(expected_return)
-
-    if(expected_return <= 0 ):
-        return True;
-
-    return False;
-
-
-
-# Reduce the list of tickers to the size provided by the user
-
-def filter_tickers( tickers, size ):
-
-    size = int(size)
-   
-    # Remove empty strings from the list
-    tickers = list(filter(None, tickers))
-    tickers = tickers[:size]
-
-    tickers = [ element.upper() for element in tickers ] # Convert to uppercase
-    tickers = sorted(tickers)
-  
-    return tickers    
-
-
-"""
-missing_stock_count = How many stocks the app needs to choose for the user
-"""
-
-def auto_select_stocks( size, tickers,  sectors ):
-
-    new_stocks = []
-
-    missing_stock_count = int(size) - len(tickers)
-    tickers = sorted(tickers)
-
-
-    # If we need to select any stocks
-    if missing_stock_count > 0:
-
-        # Put newly found stocks into a list
-        new_stocks = hp.add_stocks( missing_stock_count, tickers, sectors )
-
-
-        # Add new stocks to our original list of stocks
-        tickers.extend(new_stocks)
-        tickers = sorted(tickers)
-
-
-      
-    return tickers
-
-
-
-
 
 
 

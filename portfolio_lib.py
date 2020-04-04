@@ -3,6 +3,8 @@ from datetime import timedelta
 import datetime as dt
 import requests
 import time
+import ast
+
 api_key1 = "2M6F7YVUOQBLY4WF"
 api_key2 = 'NEMPJL3V114R3DW8'
 
@@ -45,6 +47,26 @@ def isHoliday( one ):
 
 
 
+
+
+# Reduce the list of tickers to the size provided by the user
+
+def filter_tickers( tickers, size ):
+
+    size = int(size)
+   
+    # Remove empty strings from the list
+    tickers = list(filter(None, tickers))
+    tickers = tickers[:size]
+
+    tickers = [ element.upper() for element in tickers ] # Convert to uppercase
+    tickers = sorted(tickers)
+  
+    return tickers  
+
+
+
+
 def find_suitable_date(date):
 
     date = date - timedelta(days = 1)
@@ -73,6 +95,79 @@ def find_suitable_date(date):
 
 
 
+
+
+"""
+missing_stock_count = How many stocks the app needs to choose for the user
+"""
+
+def auto_select_stocks( size, tickers,  sectors ):
+
+    new_stocks = []
+
+    missing_stock_count = int(size) - len(tickers)
+    tickers = sorted(tickers)
+
+
+    # If we need to select any stocks
+    if missing_stock_count > 0:
+
+        # Put newly found stocks into a list
+        new_stocks = hp.add_stocks( missing_stock_count, tickers, sectors )
+
+
+        # Add new stocks to our original list of stocks
+        tickers.extend(new_stocks)
+        tickers = sorted(tickers)
+
+
+      
+    return tickers
+
+
+
+
+
+
+
+def process_weights( Weights ):
+
+    # url_for converts the array to a string, literal_eval converts it back to an array
+    Weights = ast.literal_eval(Weights)
+    Weights = [ weight * 100 for weight in Weights ]
+
+    # Round weights to 2 dec places, maybe should do this in OPT code?
+    Weights = [ round(weight,3) for weight in Weights ]
+
+    return Weights
+
+
+
+def render_weights_table( tickers, weights, share_count, cash, sectors ):
+
+    i = 0
+   
+    html = '''<table class=\"table table\"><thead><tr><th scope=\"col\">#</th>
+            <th scope=\"col\">Stock</th>
+            <th scope=\"col\">Sector</th>
+            <th scope=\"col\">Weight (%)</th>
+            <th scope=\"col\">Share Count</th>
+            </tr></thead><tbody>'''.format(cash)   
+
+    for tick in tickers:
+
+        html = html + '<tr> <th>{}</th> <td id=\"t1\">{}</td> <td id=\"t1\">{}</td> <td id=\"w1\">{}</td> <td id=\"sv1\">{}</td> </tr>'.format(
+            i+1, tick, sectors[i],weights[i], share_count[i] )
+        i += 1
+
+
+    html = html + "</tbody></table>"
+				
+    return html
+
+
+
+
 # Function to calculate how much dividends would have been earned in this portfolio
 
 def CalculateDividends(tickers, weights, cash_investment):
@@ -85,64 +180,68 @@ def CalculateDividends(tickers, weights, cash_investment):
     i = 0
     api_count = 0
     wait = True
-    for stock in tickers:
 
-        if api_count > 4 and wait:
-            wait = False
-            time.sleep(60)
+    try:
 
-        url= "https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY_ADJUSTED&symbol={}&apikey={}".format( stock ,api_key1 )
+        for stock in tickers:
+
+            if api_count > 4 and wait:
+                wait = False
+                time.sleep(60)
+
+            url= "https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY_ADJUSTED&symbol={}&apikey={}".format( stock ,api_key1 )
     
 
-        r = requests.get(url=url )
-        data = r.json()
+            r = requests.get(url=url )
+            data = r.json()
 
       
-        a = (data['Monthly Adjusted Time Series'])
-        keys = a.keys()
+            a = (data['Monthly Adjusted Time Series'])
+            keys = a.keys()
 
-        starting_close = 0
+            starting_close = 0
 
-        # Find the initial closing value
-        for key in keys:
-            if key < start_date:
+            # Find the initial closing value
+            for key in keys:
+                if key < start_date:
+                    starting_close = a[key]['5. adjusted close']
+                    break;
+
+            if starting_close == 0:
+                my_list = list( keys )
+                key = list(a.keys())[-1]
                 starting_close = a[key]['5. adjusted close']
-                break;
-
-        if starting_close == 0:
-            my_list = list( keys )
-            key = list(a.keys())[-1]
-            starting_close = a[key]['5. adjusted close']
         
 
-        # Calculate how many shares could have been bought at this time
-        stock_weight = float(weights[i])/100
-        stock_cash_investment = cash_investment*stock_weight
+            # Calculate how many shares could have been bought at this time
+            stock_weight = float(weights[i])/100
+            stock_cash_investment = cash_investment*stock_weight
 
-        i += 1
-        api_count += 1
-        number_of_shares = stock_cash_investment / float(starting_close)
+            i += 1
+            api_count += 1
+            number_of_shares = stock_cash_investment / float(starting_close)
 
 
         
-        # Find total cash in dividends for this stock
-        dividend_value = 0
-        dividend_cash = 0
+            # Find total cash in dividends for this stock
+            dividend_value = 0
+            dividend_cash = 0
         
-        for key in keys:
+            for key in keys:
     
-            if key > start_date and key < end_date:
-                dividend_value = float(a[key]['7. dividend amount'])
-                dividend_cash += (dividend_value * number_of_shares)
+                if key > start_date and key < end_date:
+                    dividend_value = float(a[key]['7. dividend amount'])
+                    dividend_cash += (dividend_value * number_of_shares)
 
-        """
-            Add to a list of stock dividends (to be displayed in a summary table)
-        """
+            """
+                Add to a list of stock dividends (to be displayed in a summary table)
+            """
  
-        stock_dividend_list.append( round(dividend_cash,2) )
+            stock_dividend_list.append( round(dividend_cash,2) )
 
-    return stock_dividend_list
-
+        return stock_dividend_list
+    except:
+        return ""
 
 
 
@@ -153,7 +252,7 @@ def render_dividend_table( stock_dividend_list, tickers ):
     portfolio_dividends = "{:,.2f}".format(portfolio_dividends)
     
 
-    html = "<tbody>"
+    html = ""
     i = 0
     
     # Create a row for each stock in portfolio
@@ -182,12 +281,9 @@ def render_dividend_table( stock_dividend_list, tickers ):
                     <td id=\"\">{}</td>
                     </tr>'''.format( "Portfolio Dividends", portfolio_dividends )
 
-    html = html + "</tbody></table>"
-
-
-    dividend_dates = ""
     
-    return html, dividend_dates
+    
+    return html
 
 
 
