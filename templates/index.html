@@ -133,148 +133,168 @@
 	</div>
 	
  
-    <div class="container">
+ 
+	  <!-- This is the loading div that will display when the user is generating their portfolio -->
+		<div id="loading_div">				
+			<div class="modal-content">
+				<div class="modal-header">
+								
+				</div>
+			
+				<div class="modal-body">
+					<div style="text-align: center;" class="input-group"> 		
+						<h2 style="text-align: center;" class="modal-title">Please wait while your portfolio is being generated...</h2>
+					</div>
+				</div>
+				<div class="modal-footer">
+				</div>
+			</div>
+		</div>
+ 
+ 
+    <div id="main_container" class="container">
         
         <div id="main" class="jumbotron">
 			<h3 id="title" class="text-muted">Generate Your Portfolio</h3>
             <h4>{{ message }}</h4>
             <p class="lead"></p>
+			
 		
-
-								
-			<form name="myForm" id="theForm" action="/generatePortfolio" onsubmit="return validateForm()" method="post">
-				
-				<div>
-					<label id="checkBoxLabel" for="checkBox">Optimization Algorithm</label>
-				
-					<select name="algorithm" id = "myList">
-					   <option value = "1">Modern Portfolio Theory</option>
-					   <option id="pmpt" value = "2">Post Modern Portfolio Theory</option>	  
-					</select>
-				</div>
-				
-				<div id="mar_div">
-					<label id="minimumAdjustedReturnLabel" for="expectedReturn">Minimum Adjusted Return</label>
-				
-					<select name="mar_value">
-					    <option value = "1">0%</option>
-					    <option value = "2">1%</option>
-					    <option value = "3">2%</option>
-						<option value = "4">5%</option>					   
-					</select>
-				
-				</div>
-				
-				<div class="form-group">
-					<label id="portfolioSizeLabel" for="expectedReturn">Portfolio Size</label>
-					<small id="returnHelp" class="form-text text-muted">(Enter the number of companies you wish to invest in)</small>
-					<input type="name" name="portfolioSize" required="false" id="portfolioSize" class="form-control" placeholder="Portfolio Size" required="false">
+				<!-- Start of the form -->				
+				<form name="myForm" id="theForm" action="/generatePortfolio" onsubmit="return validateForm()" method="post">
 					
-				</div>				
-				
+					<div>
+						<label id="checkBoxLabel" for="checkBox">Optimization Algorithm</label>
 					
-	
-			<label id="portfolioSizeLabel" for="expectedReturn">Stock Selection</label>
-				
-			<small id="emailHelp" class="form-text text-muted">	(Enter the stocks that you want to have in your portfolio in ticker form. E.g. Amazon = AMZN.)</small>
-			
-			<div><small id="emailHelp" class="form-text text-muted">If your portfolio size is greater than the number of stocks you have 
-				provided then the application will autoselect some for you.</small>
-			</div>
-			
-			<div id="stockInput">
-				
-				
-				<div class="input-group">
-					
-					<input type="name" name="inputTicker1" id="inputTicker1" class="form-control" placeholder="Stock Ticker 1" autofocus>
-				
-					<span  style="visibility: hidden;"  class="input-group-addon"></span>
-						
-						<div style="padding-left: 10px;">
-							<input type="name" name="inputTicker5" id="inputTicker5" class="form-control" placeholder="Stock Ticker 5">
-						</div>
-				</div>
-				
-				<!-- INPUT 2 AND 6 -->
-				<div class="input-group">
-					
-					<input type="name" name="inputTicker2" id="inputTicker2" class="form-control" placeholder="Stock Ticker 2"  autofocus>
-					
-					<span  style="visibility: hidden;"  class="input-group-addon"></span>
-						
-					<div style="padding-left: 10px;">
-						<input type="name" name="inputTicker6" id="inputTicker6" class="form-control" placeholder="Stock Ticker 6"  autofocus>
+						<select name="algorithm" id = "myList">
+						   <option value = "1">Modern Portfolio Theory</option>
+						   <option id="pmpt" value = "2">Post Modern Portfolio Theory</option>	  
+						</select>
 					</div>
-				</div>
 					
+					<div id="mar_div">
+						<label id="minimumAdjustedReturnLabel" for="expectedReturn">Minimum Adjusted Return</label>
 					
+						<select name="mar_value">
+							<option value = "1">0%</option>
+							<option value = "2">1%</option>
+							<option value = "3">2%</option>
+							<option value = "4">5%</option>					   
+						</select>
 					
-				<!-- INPUT 3 AND 7 -->
-				<div class="input-group">
-					<input type="name" name="inputTicker3" id="inputTicker3" class="form-control" placeholder="Stock Ticker 3" >	
-					
-					<span  style="visibility: hidden;"  class="input-group-addon"></span>
-						
-					<div style="padding-left: 10px;">
-						<input type="name" name="inputTicker7" id="inputTicker7" class="form-control" placeholder="Stock Ticker 7" autofocus>
 					</div>
+					
+					<div class="form-group">
+						<label id="portfolioSizeLabel" for="expectedReturn">Portfolio Size</label>
+						<small id="returnHelp" class="form-text text-muted">(Enter the number of companies you wish to invest in)</small>
+						<input type="name" name="portfolioSize" required="false" id="portfolioSize" class="form-control" placeholder="Portfolio Size" required="false">
+						
+					</div>				
+					
+						
+		
+				<label id="portfolioSizeLabel" for="expectedReturn">Stock Selection</label>
+					
+				<small id="emailHelp" class="form-text text-muted">	(Enter the stocks that you want to have in your portfolio in ticker form. E.g. Amazon = AMZN.)</small>
 				
-				</div>	
+				<div><small id="emailHelp" class="form-text text-muted">If your portfolio size is greater than the number of stocks you have 
+					provided then the application will autoselect some for you.</small>
+				</div>
+				
+				<div id="stockInput">
 					
 					
-				<!-- INPUT 4 AND 8 -->
-				<div class="input-group">
-							
-					<input type="name" name="inputTicker4" id="inputTicker4" class="form-control" placeholder="Stock Ticker 4">
+					<div class="input-group">
+						
+						<input type="name" name="inputTicker1" id="inputTicker1" class="form-control" placeholder="Stock Ticker 1" autofocus>
+					
 						<span  style="visibility: hidden;"  class="input-group-addon"></span>
+							
+							<div style="padding-left: 10px;">
+								<input type="name" name="inputTicker5" id="inputTicker5" class="form-control" placeholder="Stock Ticker 5">
+							</div>
+					</div>
+					
+					<!-- INPUT 2 AND 6 -->
+					<div class="input-group">
 						
-					<div style="padding-left: 10px;">
-						<input type="name" name="inputTicker8" id="inputTicker8" class="form-control" placeholder="Stock Ticker 8" autofocus>
+						<input type="name" name="inputTicker2" id="inputTicker2" class="form-control" placeholder="Stock Ticker 2"  autofocus>
+						
+						<span  style="visibility: hidden;"  class="input-group-addon"></span>
+							
+						<div style="padding-left: 10px;">
+							<input type="name" name="inputTicker6" id="inputTicker6" class="form-control" placeholder="Stock Ticker 6"  autofocus>
+						</div>
 					</div>
 						
-				</div>
-				
-				
-				<button id="view_ticker_btn" type="button" class="btn-link" data-toggle="modal" data-target="#myModal">View Popular Stocks</button>
+						
+						
+					<!-- INPUT 3 AND 7 -->
+					<div class="input-group">
+						<input type="name" name="inputTicker3" id="inputTicker3" class="form-control" placeholder="Stock Ticker 3" >	
+						
+						<span  style="visibility: hidden;"  class="input-group-addon"></span>
 							
-			</div>		
+						<div style="padding-left: 10px;">
+							<input type="name" name="inputTicker7" id="inputTicker7" class="form-control" placeholder="Stock Ticker 7" autofocus>
+						</div>
 					
-				
-				<label id="checkBoxLabel" for="checkBox">Find best risk-reward ratio</label>
-				
-				<label class="switch">
-					<input type="checkbox" for="checkBox" id="checkBox" name="checkBox">
-					<span class="slider round"></span>
-				</label>
-				
-				<label id="specifyMinReturnLabel">Specify Minimum Return
-					<button style="padding-left: 60px"id="view_help_btn" type="button" class="btn-link" data-toggle="modal" data-target="#helpModal">Help?</button>
-				</label>
-				
-				<div class="form-group">
-					<label id="expectedReturnLabel" for="expectedReturn">Expected Return</label>
-					<small id="returnHelpSmall" class="form-text text-muted">(Enter the minimum rate of return for your desired portfolio)</small>
-					<input type="name" name="expectedReturn" required="false" id="expectedReturn" class="form-control" placeholder="Expected Return (%)">
-					
-				</div>
-				
-				
-				
-				
-				<div class="cash-group" style="padding-top: 40px;">
-					<label id="portfolioSizeLabel" for="expectedReturn">Cash Investment</label>
-				<small id="emailHelp" class="form-text text-muted">	(Enter the cash value of your portfolio)</small>
-					<input type="name"  name="cash"  id="cash" class="form-control" placeholder="Cash Investment (£)" required="false">
-				</div>
+					</div>	
+						
+						
+					<!-- INPUT 4 AND 8 -->
+					<div class="input-group">
+								
+						<input type="name" name="inputTicker4" id="inputTicker4" class="form-control" placeholder="Stock Ticker 4">
+							<span  style="visibility: hidden;"  class="input-group-addon"></span>
+							
+						<div style="padding-left: 10px;">
+							<input type="name" name="inputTicker8" id="inputTicker8" class="form-control" placeholder="Stock Ticker 8" autofocus>
+						</div>
+							
+					</div>
 					
 					
+					<button id="view_ticker_btn" type="button" class="btn-link" data-toggle="modal" data-target="#myModal">View Popular Stocks</button>
+								
+				</div>		
+						
 					
-				<button id="generatePortfolioBtn" data-target="#myModal" class="btn btn-lg btn-primary btn-block" type="submit">
-					Generate Portfolio</button>
+					<label id="checkBoxLabel" for="checkBox">Find best risk-reward ratio</label>
+					
+					<label class="switch">
+						<input type="checkbox" for="checkBox" id="checkBox" name="checkBox">
+						<span class="slider round"></span>
+					</label>
+					
+					<label id="specifyMinReturnLabel">Specify Minimum Return
+						<button style="padding-left: 60px"id="view_help_btn" type="button" class="btn-link" data-toggle="modal" data-target="#helpModal">Help?</button>
+					</label>
+					
+					<div class="form-group">
+						<label id="expectedReturnLabel" for="expectedReturn">Expected Return</label>
+						<small id="returnHelpSmall" class="form-text text-muted">(Enter the minimum rate of return for your desired portfolio)</small>
+						<input type="name" name="expectedReturn" required="false" id="expectedReturn" class="form-control" placeholder="Expected Return (%)">
+						
+					</div>
 					
 					
-			</form>
+					
+					
+					<div class="cash-group" style="padding-top: 40px;">
+						<label id="portfolioSizeLabel" for="expectedReturn">Cash Investment</label>
+					<small id="emailHelp" class="form-text text-muted">	(Enter the cash value of your portfolio)</small>
+						<input type="name"  name="cash"  id="cash" class="form-control" placeholder="Cash Investment (£)" required="false">
+					</div>
+						
+						
+						
+					<button id="generatePortfolioBtn" data-target="#myModal" class="btn btn-lg btn-primary btn-block" type="submit">
+						Generate Portfolio</button>
+						
+						
+				</form>
+
 			
 			<small id="emailHelp" style="font-size:15px;" class="form-text text-muted">WARNING: The creator of this tool is not a professional in the finance industry and you should therefore take any information
 			from it with caution.</small>
