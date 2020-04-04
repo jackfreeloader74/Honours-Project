@@ -17,8 +17,12 @@ function init()
 	
 	$("#mar_div").hide();
 	
-	//$("#loader").hide();
+	
 	$("#specifyMinReturnLabel").css("font-weight", "normal")
+	
+	
+	/* Hide the loading div, show it when the user successfully generates a portfolio */
+	$("#loading_div").hide();
 	
 	$("#appointmentEditDialog").dialog({	modal:true,			//modal dialog to disable parent when dialog is active
 	autoOpen:false,		//set autoOpen to false, hidding dialog after creation
@@ -135,8 +139,12 @@ function validateForm() {
 		return false;
 	}
 	else
-	{		
-		//$("#loader").show();	
+	{	
+		window.scrollTo(100, 100);
+		$("#loading_div").show();
+		$("#main_container").hide();
+		$("#preset").hide();
+		$("#preset2").hide();
 		return true;
 	}
 }
@@ -233,6 +241,7 @@ $(function() {
  
  
 
+/* Preset that fills out the form with static values */
 $(function() {
 	
 	$("#preset").click(function() {
@@ -251,6 +260,7 @@ $(function() {
 		$("#appointmentEditDialog").dialog("open",true);
 	});
 });
+
 
 
 $(function() {
@@ -296,51 +306,34 @@ $(function() {
 });
 
 
-$(function() {
-	$("#ticker-search1").click(function() {
-		
-	});
-});
 
+
+
+
+/* User is exporting portfolio to PDF. Call ajax function to provide server with html to produce the pdf */
 
 $(function() {
     $('#exportToPdfBtn').click(function() {	
 		
 		var exp_return = $("#return").text()
-		var risk = $("#risk").text()
+		var risk = $("#risk").text();
 		
-		// Obtain portfolio tickers		
-		var t1= $("#t1").text()
-		var t2 = $("#t2").text()
-		var t3 = $("#t3").text()
-		var t4 = $("#t4").text()
-		
-		tickers = [t1, t2, t3, t4]
-		tickers = JSON.stringify(tickers);
-		
-		
-		// Obtain corresponding weights
-		var w1 = $("#w1").text()
-		var w2 = $("#w2").text()
-		var w3 = $("#w3").text()
-		var w4 = $("#w4").text()
-		
-		weights = [w1, w2, w3, w4]	
-		weights = JSON.stringify(weights);
-		
-		var table = $("#myTable").html()
+		var cash = $("#cash").text();
+		var table = $("#myTable").html();
 	
-		//console.log("Row" + rowData)
+		var dividends = $("#dividend_table").html();
+		
+		
+		console.log(dividends);
 		
 		/* Add them as parameters to request */
 		var data = {
 			Return: exp_return,
 			Risk: risk,
-			Tickers: tickers,
-			Weights: weights,
-			table: table
+			cash: cash,
+			table: table,
+			dividends: dividends
 		}
-		
 		
 		
         $.ajax({
