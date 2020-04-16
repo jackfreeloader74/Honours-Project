@@ -61,10 +61,9 @@ def ShowPortfolio():
     stock_names = hp.find_stock_names( tickers )
     
     # Render the portfolio weights table
-    table = pl.render_weights_table( stock_names, weights, share_volume_list, cash_str, sectors)
+    table = pl.render_weights_table( tickers, stock_names, weights, share_volume_list, cash_str, sectors )
  
    
-
     # Are we using Sharpe or Sortino?
     algorithm = pl.calculate_ratio( algorithm)
 
@@ -94,7 +93,6 @@ def ShowPortfolio():
 
 
 
-
 """
 Checkboxe values only get posted in a form request if the checkbox is "on".
 This means finding the value from the form needs to be wrapped in a try catch
@@ -105,7 +103,7 @@ def generatePortfolio():
     
     BestRatio = True;
 
-
+    # If the checkbox is off, the request form will throw an error if you try to access it
     try:
         Checked = request.form['checkBox']
     except:
@@ -198,10 +196,28 @@ def generatePortfolio():
                                 share_volume_list=str(share_volume_list),
                                 weights=str(weights),
                                 tickers=str(tickers)) )
+
+
+
+
+
+# This returns the PDF
+@app.route('/stockDetail/<ticker>', methods=['GET'] )
+def stockDetail(ticker):
+
+    #hp.plot_candle_stock(ticker)
+    stock_name = request.args.get('stock_name')
+
+    img = pl.find_stock_logo( stock_name )
+
+    return img
+
+
+
   
   
 
-
+# This returns the PDF
 @app.route('/ShowPDF')
 def ShowPDF():
     return send_file('static/images/portfolio.pdf')

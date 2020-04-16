@@ -4,14 +4,18 @@ import datetime as dt
 import requests
 import time
 import ast
+import clearbit
+import opt_algorithms as hp
 
 api_key1 = "2M6F7YVUOQBLY4WF"
 api_key2 = 'NEMPJL3V114R3DW8'
 
+
+clearbit.key = "sk_34b33f60cc6cb5f54ee9033cfe4bf757"
+
 #import opt_algorithms as hp
 
-#start_date = hp.global_start_date
-#end_date = hp.global_end_date
+
 
 start_date = "2010-01-01"
 end_date = "2020-01-01"
@@ -126,6 +130,33 @@ def auto_select_stocks( size, tickers,  sectors ):
 
 
 
+"""
+    Using the ClearBit API and the stocks full name, retrieve the stocks
+    logo and return it. 
+"""
+
+def find_stock_logo( stock_name ):
+
+    img = ""
+
+    # Filter out any Incs, Ltd's etc that will cause the api query to fail
+    stock_name = stock_name.replace(',', '' )
+    stock_name = stock_name.replace('Inc.', '')
+    stock_name = stock_name.replace('Ltd', '' )
+    stock_name = stock_name.replace('Corporation', '' )
+    stock_name = stock_name.replace('.com', '' )
+
+   
+    try:
+        response = clearbit.NameToDomain.find(name=stock_name)
+
+        img = response['logo']
+
+    except:
+        return False
+
+    return img
+    
 
 
 
@@ -143,11 +174,12 @@ def process_weights( Weights ):
 
 
 
-def render_weights_table( tickers, weights, share_count, cash, sectors ):
-
+#def render_weights_table( tickers, stock_names, weights, share_count, cash, sectors ):
+def render_weights_table( tickers, stock_names, weights, share_count, cash, sectors ):
     i = 0
    
-    html = '''<table class=\"table table\"><thead><tr><th scope=\"col\">#</th>
+    html = '''<table style="background-color: #eee;" id="weights_table" class=\"table table\">
+            <thead><tr><th scope=\"col\">#</th>
             <th scope=\"col\">Stock</th>
             <th scope=\"col\">Sector</th>
             <th scope=\"col\">Weight (%)</th>
@@ -156,8 +188,19 @@ def render_weights_table( tickers, weights, share_count, cash, sectors ):
 
     for tick in tickers:
 
-        html = html + '<tr> <th>{}</th> <td id=\"t1\">{}</td> <td id=\"t1\">{}</td> <td id=\"w1\">{}</td> <td id=\"sv1\">{}</td> </tr>'.format(
-            i+1, tick, sectors[i],weights[i], share_count[i] )
+        stock_name_id = tick + "_name_id"
+        sector_id = tick + "_sector_id"
+
+        html = html + '''
+                <tr id="{}">
+                    <th>{}</th> 
+                    <td id="{}">{}</td> 
+                    <td id="{}">{}</td> 
+                    <td id=\"w1\">{}</td>   
+                    <td id="">{}</td>   
+                </tr>'''.format(
+            tick, i+1, stock_name_id, stock_names[i], sector_id ,sectors[i],weights[i], share_count[i] )
+        
         i += 1
 
 

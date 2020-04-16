@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 from dateutil.relativedelta import relativedelta
 from datetime import timedelta
 
+
+
 import portfolio_lib as pl
 
 
@@ -14,6 +16,8 @@ yahoo_up = True
 global_start_date = '01/01/2010'
 global_end_date = '01/01/2020'
 TRADING_DAYS = 252
+
+clear_bit_api_key = "sk_34b33f60cc6cb5f54ee9033cfe4bf757"
 
 
 # Specify number of iterations to create
@@ -27,15 +31,15 @@ def OptimizePortfolio(tickers, user_expected_return, FindBestRatio, cash, algori
     stocks = tickers
     stocks = sorted(stocks)
 
-    print( "Stocks ", stocks )
-    print( "Mar Val", mar_value )
     
     """ Read adj close data from api for each stock into a dataframe """
     if yahoo_up:
      
-        data = web.DataReader( stocks, data_source="yahoo", start=global_start_date, end=global_end_date)['Adj Close']
-        data.sort_index(inplace=True)
-    
+        try:
+            data = web.DataReader( stocks, data_source="yahoo", start=global_start_date, end=global_end_date)['Adj Close']
+            data.sort_index(inplace=True)
+        except:
+            return False, "Something went wrong", None
     else:
         data = pd.read_csv('stocks.csv')
         data.sort_index(inplace=True)
@@ -123,9 +127,7 @@ def OptimizePortfolio(tickers, user_expected_return, FindBestRatio, cash, algori
                 currentRisk = round(results[1,i],2)
 
 
-    print( "Best Weights ", BestWeights, " Expected return ", BestReturn , " Sharpe: ", currentSharpe)
-    print( "Worst Weights ", WorstWeights, " Expected return ", WorstReturn , " Sharpe ", currentWorstSharpe )
-
+   
     labels = []
 
     for item in stocks:
@@ -314,6 +316,15 @@ def plot_pie_chart(labels, BestWeights):
     plt.savefig('static\\images\\pie_chart.png', bbox_inches='tight')
 
 
+
+def plot_candle_stock( ticker ):
+    
+  
+    data = web.DataReader( [ticker], data_source="yahoo", start=global_start_date, end=global_end_date)
+    data.reset_index(inplace=True)
+
+
+    return True
 
 
 
@@ -538,7 +549,7 @@ def calculate_sector_weights(sector_list, weights):
 
 
 
-
+""" Counts how many of each sector are in the portfolio """
                       
 def perform_sector_count( sector_list, weights ):
 
@@ -645,12 +656,11 @@ def add_stocks( num_stocks, tickers, sectors ):
             stock = find_stock_in_sector( least )        
             found_stocks.append( stock )
        
-    
-
-  
-        
-        
+            
     return found_stocks
+
+
+
 
 def find_stock_in_sector( sector ):
     
