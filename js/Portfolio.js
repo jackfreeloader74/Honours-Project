@@ -31,12 +31,16 @@ function init()
 	minHeight: 400
 	});
 	
-
-
-
-
 	return true;
 };
+
+
+
+
+
+//$(document).ready(function() {
+
+
 
 
 
@@ -192,7 +196,6 @@ $(function() {
 			$("#MyModal").modal();
 		});
 	});
-	
 });
 
 
@@ -233,7 +236,7 @@ $(function() {
 	$("#view_help_btn").click(function() {
 		
 		$(document).ready(function() {
-			$("#helpModal").modal();
+			$("#MyModal").modal();
 		});
 	});
 	
@@ -350,3 +353,157 @@ $(function() {
         });  
     });
 });
+
+
+/* Build up the html that will be placed in the stock detail popups header */
+function build_stock_detail_header( ticker, stock_name, img )
+{
+			
+	
+		var header = "<div id='container'>" +
+
+							"<div id='stock_logo' style='float: right;'  style='display:inline;'>" + 
+							"</div>" + 
+							
+							"<div id='texts' style='display:inline;'>" +  
+								"<h1 class='display-4'>" + stock_name + "</h1>" +
+							"</div>" +	
+						
+											
+						"</div>";
+	
+	
+		return header;
+}
+
+function formatNumber(num) {
+
+  return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
+}
+
+
+function build_stock_detail_body( ticker, share_price, domain, employees, marketCap, foundingYear, line_chart_file)
+{
+		var sector = stock + "_sector_id" 
+		
+				
+		sector = $("#" + sector).text();	 
+		var body = "<h3>Sector: " + sector + "</h3>"
+		
+		if( share_price != null )
+			body += "<h3>Current Share Price: $" + share_price + "</h3>";
+		
+		if( domain != null )
+			body += "<h3>Domain: <a target='_blank' href='//" + domain + "'>" + domain + "</a></h3>";
+		
+		if( marketCap != null )
+		{
+			marketCap = formatNumber( marketCap )
+			body += "<h3>Market Capitilization: $" + marketCap
+		}
+		
+		if( employees != null )
+		{
+			employees = formatNumber( employees )
+			body += "<h3>Employee Count: " + employees + "</h3>";
+		}
+		
+		if( foundingYear != null )
+		{
+			body += "<h3>Founding Year: " + foundingYear + "</h3>";
+		}
+		
+		if( line_chart_file != null )
+		{
+			body += "<img src='" + line_chart_file + "' height='350' width='500' />";
+		}
+		
+		return body
+}
+
+
+/* Event listener for weights table rows. Opens a popup that shows more info about a stock */
+
+$(function() {
+	
+    $('#weights_table tr').click(function() {
+       	
+		/* Clear the popup of any previous info */
+		$('#modal-head').html("");
+		$('#modal-body').html("");
+		
+		/* Get the ticker symbol for this stock */
+		stock = this.id;
+		
+
+		if( stock != "")
+		{	
+			var stock_name = stock + "_name_id" 
+			stock_name = $("#" + stock_name).text();
+			
+			
+			var header = build_stock_detail_header( stock, stock_name );
+			
+						
+						
+			/* Attatch html to the modal and display it */
+			$('#modal-head').html(header);
+			
+			$('#stockModal').modal({show:true});
+			
+
+			var url = '/stockDetail/' + stock;
+				
+			var data =  {
+				stock_name: stock_name
+			}
+			
+	
+			/* Request further stock details from server */
+			$.ajax({
+				url: url,
+				type: 'GET',
+				data: data, 
+				success: function(response) {
+				 					
+					
+					response = JSON.parse(response);
+					var share_price = response['share_price'];
+					var img = response['img'];
+					var domain = response['domain'];
+					var employees = response['employees'];
+					var marketCap = response['marketCap'];
+					var foundingYear = response['foundedYear'];
+					var line_chart_file = response['line_chart_file'];
+					
+					
+					
+						
+					if(img != null )
+					{
+						/* Prepare image */	
+						logo = "<img src='" + img + "' height='100' width='100' />";
+						$('#stock_logo').append(logo);				
+					}
+					
+					var body = build_stock_detail_body( stock, share_price, domain, employees, marketCap, foundingYear, line_chart_file );
+					$('#modal-body').html(body);
+					
+				},
+				error: function(error) {
+					alert("Failed");
+				}
+			}); 
+									
+		}
+		
+		
+    });
+});
+
+
+
+
+
+
+
