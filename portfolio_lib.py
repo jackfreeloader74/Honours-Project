@@ -132,10 +132,10 @@ def auto_select_stocks( size, tickers,  sectors ):
 
 """
     Using the ClearBit API and the stocks full name, retrieve the stocks
-    logo and return it. 
+    logo + other info and return it. 
 """
 
-def find_stock_logo( stock_name ):
+def find_company_info( stock_name ):
 
     img = ""
 
@@ -145,17 +145,39 @@ def find_stock_logo( stock_name ):
     stock_name = stock_name.replace('Ltd', '' )
     stock_name = stock_name.replace('Corporation', '' )
     stock_name = stock_name.replace('.com', '' )
+    #stock_name = stock_name.replace('Consolidated', '' )
 
+    #print("sTOCK ", stock_name )
    
     try:
         response = clearbit.NameToDomain.find(name=stock_name)
 
+        domain = response['domain']
         img = response['logo']
+
+        # Now use the domain to perform the more detailed domain request
+        company = clearbit.Company.find(domain=domain,stream=True)
+       
+        metrics = company['metrics']
+        foundedYear = company['foundedYear']
+    
+               
+        marketCap = metrics['marketCap']
+        employees = metrics['employees']
+        
+       
+        detail_dict = { 'img': img,
+                        'domain' : domain,
+                        'employees' : employees,
+                        'marketCap' : marketCap,
+                        'foundedYear' : foundedYear
+                      }
+
 
     except:
         return False
 
-    return img
+    return detail_dict
     
 
 

@@ -201,16 +201,29 @@ def generatePortfolio():
 
 
 
-# This returns the PDF
+# Returns a json object with extra details about a stock (e.g. net worth, logo etc)
 @app.route('/stockDetail/<ticker>', methods=['GET'] )
 def stockDetail(ticker):
 
-    #hp.plot_candle_stock(ticker)
+    
     stock_name = request.args.get('stock_name')
 
-    img = pl.find_stock_logo( stock_name )
+    share_price, line_chart_file = hp.query_ticker_data(ticker)
 
-    return img
+    
+    
+    detail_dict = pl.find_company_info( stock_name )
+
+    if detail_dict != False:
+        # Add share price to the dictionary that is being returned 
+        detail_dict['share_price'] = share_price
+
+        detail_dict['line_chart_file'] = line_chart_file
+    
+
+    print( detail_dict )
+    
+    return json.dumps(detail_dict)
 
 
 

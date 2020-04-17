@@ -5,7 +5,7 @@ import datetime as dt
 import matplotlib.pyplot as plt
 from dateutil.relativedelta import relativedelta
 from datetime import timedelta
-
+import time
 
 
 import portfolio_lib as pl
@@ -317,14 +317,29 @@ def plot_pie_chart(labels, BestWeights):
 
 
 
-def plot_candle_stock( ticker ):
-    
+def query_ticker_data( ticker ):
+
+    today = time.strftime("%m/%d/%Y")
   
-    data = web.DataReader( [ticker], data_source="yahoo", start=global_start_date, end=global_end_date)
-    data.reset_index(inplace=True)
+    data = web.DataReader( [ticker], data_source="yahoo", start=global_start_date, end=today)
+    
+
+    close_row = data['Close'].iloc[-1]
+    close = round(close_row[ticker],2)
+
+    # Draw Graph
+    plt.cla()
+    plt.clf()
+  
+    ax = data['Close'].plot(label='Portfolio',figsize=(16,8), title="Stock Performance")
+    ax.set_ylabel("Portfolio Value ($)")
 
 
-    return True
+    line_chart_file = "static\\images\\portfolio_value_chart.png"
+    plt.savefig(line_chart_file, bbox_inches='tight')
+
+
+    return close, line_chart_file
 
 
 
