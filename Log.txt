@@ -434,6 +434,11 @@ Started to write up design in final report
 
 -----------------------------------------------------------------------------------------------------
 
+18/04/2020
+
+Added popups to the portfolio summary page ( when you click on a stock in the weight allocation table )
+The popup shows the companys logo, its current share value, market cap, number of employees, founding year 
+and a value graph. 
 
 -----------------------------------------------------------------------------------------------------
 
