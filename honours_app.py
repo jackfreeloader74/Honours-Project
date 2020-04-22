@@ -9,27 +9,41 @@ import ast
 import portfolio_lib as pl
 
 app = Flask(__name__)
+
+# Config for PDFKit
 config = pdfkit.configuration(wkhtmltopdf='C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe')
 
 
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 
-
+# Url to return the index/portfolio input form
 
 @app.route("/")
 def main():
     return render_template('index.html')
 
+
+# Url when the user has entered bad details on the portfolio form page
+
 @app.route("/Invalid")
 def Invalid():
     message = request.args['message']
+
+    # The message depends on the errror (e.g. invalid ticker)
     return render_template('index.html', message=message)
+
+
+
+# Url that returns the about page that gives details on the optimization algorithms
 
 @app.route("/about")
 def about():
     return render_template('about.html')
 
+
+
+# Displays the portfolio summary page
 
 @app.route('/ShowPortfolio')
 def ShowPortfolio():
@@ -45,6 +59,11 @@ def ShowPortfolio():
     sectors = request.args['sectors']
 
     
+    cash = request.args['cash']
+    cash_str = "{:,.2f}".format(float(cash))
+    future_cash_str = pl.future_cash_value( cash, Return )
+    
+    
     Ratio = round(float(Return)/float(Risk),2)
     Return = round(float(Return)*100,3)
     
@@ -55,31 +74,31 @@ def ShowPortfolio():
     sectors = ast.literal_eval(sectors)
     share_volume_list = ast.literal_eval(share_volume_list)
 
-    # Table on summary page is of dynamic length so we create the html here
+   
 
     # Find the stocks names from the symbols AAPL -> Apple Inc
     stock_names = hp.find_stock_names( tickers )
     
-    # Render the portfolio weights table
+     # Table on summary page is of dynamic length so we create the html here
     table = pl.render_weights_table( tickers, stock_names, weights, share_volume_list, cash_str, sectors )
- 
    
-    # Are we using Sharpe or Sortino?
+    # Are we using Sharpe or Sortino? This gets displayed in one of the tables
     algorithm = pl.calculate_ratio( algorithm)
 
-    # Calculate Stock dividends
+    # Calculate Stock dividends ( list of dividend value for each stock )
     stock_dividend_list = pl.CalculateDividends( tickers, weights, cash)
 
     # Backup for when API limit is reached
     #stock_dividend_list = [ 4051.72, 0, 1078.34, 3019.38, 0, 0 , 0 , 0 ]
-    
+
+    # If the stock dividend call failed, dont render the table
     if stock_dividend_list:
         dividend_table = pl.render_dividend_table( stock_dividend_list, tickers)
     else:
         # In case dividend api call failed
         dividend_table = ""
 
-        
+    
     return render_template('portfolio_summary.html', name = 'Portfolio Weights',
                            Return = Return,
                            Ratio = Ratio,
@@ -87,15 +106,17 @@ def ShowPortfolio():
                            table=table,
                            dividend_table=dividend_table,
                            algorithm=algorithm,
-                           Cash=cash_str,    
+                           Cash=cash_str,
+                           future_cash=future_cash_str,
                            url_pie ='static/images/pie_chart.png',
                            url_efficient ='static/images/efficient_frontier.png')
 
 
 
 """
-Checkboxe values only get posted in a form request if the checkbox is "on".
-This means finding the value from the form needs to be wrapped in a try catch
+    URL for generating the users portfolio (called when the user selects the
+    "Generate Portfolio" button on the intial portfolio form page.
+
 """
     
 @app.route('/generatePortfolio', methods=['POST'])
@@ -131,9 +152,9 @@ def generatePortfolio():
     portfolio_size = request.form['portfolioSize']
 
     algorithm = request.form['algorithm']
-    mar_value = request.form['mar_value']
-    algorithm = pl.calculate_algorithm( algorithm )
-    mar_value = pl.calculate_mar( mar_value )
+    mar_value = request.form['mar_value'] # Only relevant to PMPT
+    algorithm = pl.calculate_algorithm( algorithm ) 
+    mar_value = pl.calculate_mar( mar_value ) # Use the dropdown number option to calculate what MAR was selected
     
     cash = request.form['cash']
     if(cash == "" ):
@@ -147,6 +168,7 @@ def generatePortfolio():
 
 
     # Calculate what sectors these belong to as well as the stocks official name
+
     sector_list = list(hp.find_sectors( tickers ) ) # What sectors do they belong to
     tickers = pl.auto_select_stocks( portfolio_size, tickers, sector_list) # Find stocks to add to portfolio  
     sector_list = list(hp.find_sectors( tickers ) ) # Find all the sectors again but with the newly added stocks
@@ -186,7 +208,10 @@ def generatePortfolio():
         hp.plot_sector_chart( sector_list, weights )
 
              
-        weights = list(weights)        
+        weights = list(weights)
+
+        # Redirect to the Show Portfolio URL and pass it the required parameters so it can show the summary page
+        
         return redirect(url_for('.ShowPortfolio',
                                 Return=Return,
                                 Risk=Risk,
@@ -205,24 +230,26 @@ def generatePortfolio():
 @app.route('/stockDetail/<ticker>', methods=['GET'] )
 def stockDetail(ticker):
 
-    
+    # Obtain full stock name from the GET request
     stock_name = request.args.get('stock_name')
 
+    # Find the current share price of the stock as well as generate a graph for the portfolios value over time
     share_price, line_chart_file = hp.query_ticker_data(ticker)
 
     
-    
+    # Use clearbit API to find extra info about the company (logo, marketcap, founding year etc..)
+    # This api call may fail since the company names can be off slightly
     detail_dict = pl.find_company_info( stock_name )
 
+    
     if detail_dict != False:
+
         # Add share price to the dictionary that is being returned 
         detail_dict['share_price'] = share_price
 
         detail_dict['line_chart_file'] = line_chart_file
     
 
-    print( detail_dict )
-    
     return json.dumps(detail_dict)
 
 
@@ -248,8 +275,9 @@ def generatePDF():
     table = request.args.get('table')
     dividend_details = request.args.get('dividends')
     cash = request.args.get('cash')
+    future_cash = request.args.get('future_cash')
 
-
+    
     # Need to remove the % so the sharpe ratio can be calcluated
     exp_return = float(expected_return_str.replace("%", "")) 
     Sharpe = round((exp_return/100)/float(risk),2)
@@ -261,6 +289,7 @@ def generatePDF():
                                Risk=risk,
                                Sharpe=Sharpe,
                                cash=cash,
+                               future_cash=future_cash,
                                url_pie='C:/Users/marc.smith/AppData/Local/Programs/Python/Python37-32/static/images/pie_chart.png',
                                sector_pie='C:/Users/marc.smith/AppData/Local/Programs/Python/Python37-32/static/images/sector_makeup.png',
                                url_efficient='C:/Users/marc.smith/AppData/Local/Programs/Python/Python37-32/static/images/efficient_frontier.png',

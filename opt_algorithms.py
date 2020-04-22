@@ -7,7 +7,7 @@ from dateutil.relativedelta import relativedelta
 from datetime import timedelta
 import time
 
-
+from random import randint
 import portfolio_lib as pl
 
 
@@ -26,16 +26,19 @@ num_portfolios = 25000
 #num_portfolios = 50
 
 
+# Method to produce the weight allocation deemed optimal by the algorithm
+
 def OptimizePortfolio(tickers, user_expected_return, FindBestRatio, cash, algorithm, mar_value):
 
     stocks = tickers
     stocks = sorted(stocks)
 
     
-    """ Read adj close data from api for each stock into a dataframe """
+    
     if yahoo_up:
      
         try:
+            """ Read adj close data from api for each stock into a dataframe """
             data = web.DataReader( stocks, data_source="yahoo", start=global_start_date, end=global_end_date)['Adj Close']
             data.sort_index(inplace=True)
         except:
@@ -51,6 +54,8 @@ def OptimizePortfolio(tickers, user_expected_return, FindBestRatio, cash, algori
         if data[ticker].isnull().all():
             return False, ticker, None
 
+    # Calculate the sharpe ratio for each stock in the portfolio and put it into a list
+    # This list will be used to plot points on the efficient frontier graph
     stock_sharpe_list = find_stock_sharpes(data, stocks)
     data = data.dropna()
 
@@ -60,7 +65,6 @@ def OptimizePortfolio(tickers, user_expected_return, FindBestRatio, cash, algori
     # Calculate mean daily return and covariance of daily returns
     mean_daily_returns = returns.mean()
   
-
 
     # If we are using PMPT, use downside derivation instead of just normal stdev.
     # The downside derivation (MAR) is defined by the user and held in variable mar_value
@@ -101,7 +105,7 @@ def OptimizePortfolio(tickers, user_expected_return, FindBestRatio, cash, algori
         # Store Sharpe/Sortino Ratio  ( return / volatility )
         results[2,i] = results[0,i] / results[1,i]
    
-        ## Find the portfolio with the best sharpe ratio
+        # Find the portfolio with the best sharpe ratio
         if FindBestRatio:
             if results[2,i] > currentSharpe:
                 currentSharpe = results[2,i]
@@ -130,6 +134,7 @@ def OptimizePortfolio(tickers, user_expected_return, FindBestRatio, cash, algori
    
     labels = []
 
+    # Get a list of the stocks to be used as labels for the pie charts
     for item in stocks:
         labels.append( item )
 
@@ -185,6 +190,9 @@ class StockSharpe:
     ticker = ""
 
 
+
+# Find the sharpe ratio for each stock in the tickers list
+# The data param contains the adjusted closes for each stock in the tickers list
 def find_stock_sharpes( data, tickers):
 
     stock_list = []
@@ -217,9 +225,6 @@ def find_stock_sharpes( data, tickers):
 
         
         stock_list.append( sharpeObj )
-
-
-   
 
     return stock_list
 
@@ -319,6 +324,8 @@ def plot_pie_chart(labels, BestWeights):
 
 def query_ticker_data( ticker ):
 
+    
+
     today = time.strftime("%m/%d/%Y")
   
     data = web.DataReader( [ticker], data_source="yahoo", start=global_start_date, end=today)
@@ -335,7 +342,7 @@ def query_ticker_data( ticker ):
     ax.set_ylabel("Portfolio Value ($)")
 
 
-    line_chart_file = "static\\images\\portfolio_value_chart.png"
+    line_chart_file = "static\\images\\stock_value_chart_{}.png".format(randint(100, 999))
     plt.savefig(line_chart_file, bbox_inches='tight')
 
 

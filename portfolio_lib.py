@@ -13,14 +13,14 @@ api_key2 = 'NEMPJL3V114R3DW8'
 
 clearbit.key = "sk_34b33f60cc6cb5f54ee9033cfe4bf757"
 
-#import opt_algorithms as hp
-
-
 
 start_date = "2010-01-01"
 end_date = "2020-01-01"
 
-def isHoliday( one ):
+
+# Is today one of the several holidays in which the stock market is closed
+
+def isHoliday( today ):
 
     presidents = dt.date(2020, 2, 17)
 
@@ -40,10 +40,10 @@ def isHoliday( one ):
 
        
         
-        if one.day == holiday.day and one.month == holiday.month:
+        if today.day == holiday.day and today.month == holiday.month:
             return True
 
-        if one.day == holiday.day + 1 and one.month == holiday.month:
+        if today.day == holiday.day + 1 and today.month == holiday.month:
                
             return True
 
@@ -54,7 +54,6 @@ def isHoliday( one ):
 
 
 # Reduce the list of tickers to the size provided by the user
-
 def filter_tickers( tickers, size ):
 
     size = int(size)
@@ -147,7 +146,6 @@ def find_company_info( stock_name ):
     stock_name = stock_name.replace('.com', '' )
     #stock_name = stock_name.replace('Consolidated', '' )
 
-    #print("sTOCK ", stock_name )
    
     try:
         response = clearbit.NameToDomain.find(name=stock_name)
@@ -164,13 +162,14 @@ def find_company_info( stock_name ):
                
         marketCap = metrics['marketCap']
         employees = metrics['employees']
-        
+        annual = metrics['estimatedAnnualRevenue'] 
        
         detail_dict = { 'img': img,
                         'domain' : domain,
                         'employees' : employees,
                         'marketCap' : marketCap,
-                        'foundedYear' : foundedYear
+                        'foundedYear' : foundedYear,
+                        'annual' : annual
                       }
 
 
@@ -397,6 +396,24 @@ def calculate_ratio( algorithm ):
         return "Sharpe"
     else:
         return "Sortino"
+
+
+
+
+def future_cash_value( cash, Return ):
+
+    # convert cash to float
+    cash = float(cash)
+    Return = float(Return)
+
+    profit = cash * Return
+
+    future_cash = profit + cash
+    
+    future_cash = "{:,.2f}".format(future_cash)
+    return future_cash
+
+    
 
 
         
