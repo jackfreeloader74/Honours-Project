@@ -321,19 +321,21 @@ $(function() {
 		var exp_return = $("#return").text()
 		var risk = $("#risk").text();
 		
+		
 		var cash = $("#cash").text();
+		var future_cash = $("#future_cash").text();
 		var table = $("#myTable").html();
 	
 		var dividends = $("#dividend_table").html();
 		
 		
-		console.log(dividends);
-		
+	
 		/* Add them as parameters to request */
 		var data = {
 			Return: exp_return,
 			Risk: risk,
 			cash: cash,
+			future_cash : future_cash,
 			table: table,
 			dividends: dividends
 		}
@@ -348,7 +350,7 @@ $(function() {
 				console.log(response);
             },
             error: function(error) {
-               
+				alert("Something went wrong");
             }
         });  
     });
@@ -376,13 +378,20 @@ function build_stock_detail_header( ticker, stock_name, img )
 		return header;
 }
 
+
+
+/* Add commas to large numbers */
 function formatNumber(num) {
 
   return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
 }
 
 
-function build_stock_detail_body( ticker, share_price, domain, employees, marketCap, foundingYear, line_chart_file)
+
+
+/* Creates the html that goes into the stock popups body. If the API failed to retrieve certain data, it wont return anything */
+
+function build_stock_detail_body( ticker, share_price, domain, employees, marketCap, foundingYear, line_chart_file, annual)
 {
 		var sector = stock + "_sector_id" 
 		
@@ -393,13 +402,17 @@ function build_stock_detail_body( ticker, share_price, domain, employees, market
 		if( share_price != null )
 			body += "<h3>Current Share Price: $" + share_price + "</h3>";
 		
-		if( domain != null )
-			body += "<h3>Domain: <a target='_blank' href='//" + domain + "'>" + domain + "</a></h3>";
 		
 		if( marketCap != null )
 		{
 			marketCap = formatNumber( marketCap )
 			body += "<h3>Market Capitilization: $" + marketCap
+		}
+		
+	
+		if( annual != null )
+		{
+			body += "<h3>Estimated Annual Revenue: " + annual + "</h3>";	
 		}
 		
 		if( employees != null )
@@ -412,6 +425,10 @@ function build_stock_detail_body( ticker, share_price, domain, employees, market
 		{
 			body += "<h3>Founding Year: " + foundingYear + "</h3>";
 		}
+		
+		if( domain != null )
+			body += "<h3>Domain: <a target='_blank' href='//" + domain + "'>" + domain + "</a></h3>";
+		
 		
 		if( line_chart_file != null )
 		{
@@ -475,7 +492,7 @@ $(function() {
 					var marketCap = response['marketCap'];
 					var foundingYear = response['foundedYear'];
 					var line_chart_file = response['line_chart_file'];
-					
+					var annual = response['annual'];
 					
 					
 						
@@ -486,7 +503,7 @@ $(function() {
 						$('#stock_logo').append(logo);				
 					}
 					
-					var body = build_stock_detail_body( stock, share_price, domain, employees, marketCap, foundingYear, line_chart_file );
+					var body = build_stock_detail_body( stock, share_price, domain, employees, marketCap, foundingYear, line_chart_file, annual );
 					$('#modal-body').html(body);
 					
 				},
