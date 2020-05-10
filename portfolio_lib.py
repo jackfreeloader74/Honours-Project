@@ -8,7 +8,8 @@ import clearbit
 import opt_algorithms as hp
 import pandas as pd
 
-from asset import Asset
+from portfolio_classes.portfolio import Portfolio
+from portfolio_classes.asset import Asset
 
 api_key1 = "2M6F7YVUOQBLY4WF"
 api_key2 = 'NEMPJL3V114R3DW8'
@@ -19,6 +20,113 @@ clearbit.key = "sk_34b33f60cc6cb5f54ee9033cfe4bf757"
 
 start_date = "2010-01-01"
 end_date = "2020-01-01"
+
+
+def create_portfolio_object(request):
+
+    # Obtain all input from the user
+    user_expected_return = request['expectedReturn']
+    algorithm = request['algorithm']
+    mar_value = request['mar_value'] # Only relevant to PMPT
+    cash = request['cash']
+    portfolio_size = request['portfolioSize']
+    tickers = retrieve_user_stocks(request)
+
+    # If the checkbox is off, the request form will throw an error if you try to access it
+    BestRatio = True;
+    try:
+        Checked = request.form['checkBox']
+        BestRatio = False
+    except:
+        Checked = "off"
+
+    # Default cash to 10,000 if none is provided
+    if(cash == "" ):
+        cash = 10000
+
+    # Calculate what sectors these belong to as well as the stocks official name
+    sector_list = list(hp.find_sectors( tickers ) ) # What sectors do they belong to
+    tickers = sorted(auto_select_stocks( portfolio_size, tickers, sector_list) ) # Find stocks to add to portfolio
+    sector_list = list(hp.find_sectors( tickers ) ) # Find all the sectors again but with the newly added stocks
+
+    # Create the portfolio and asset objects
+    portfolio = Portfolio(cash=cash, algorithm=algorithm, mar_value=mar_value, user_expected_return=user_expected_return)
+
+    # Format algorithm and MAR value
+    portfolio.algorithm = calculate_algorithm( algorithm )
+    portfolio.mar_value = calculate_mar( mar_value ) # Use the dropdown number option to calculate what MAR was selected
+    portfolio.BestRatio = BestRatio
+
+    assets = createAssets(tickers, sector_list, portfolio)
+    portfolio.assets = assets
+
+    return portfolio
+
+
+# Place all user provided stocks into a list and filter out the empty inputs
+def retrieve_user_stocks(request):
+
+    tickers = []
+
+    _ticker1 = request['inputTicker1']
+    _ticker2 = request['inputTicker2']
+    _ticker3 = request['inputTicker3']
+    _ticker4 = request['inputTicker4']
+    _ticker5 = request['inputTicker5']
+    _ticker6 = request['inputTicker6']
+    _ticker7 = request['inputTicker7']
+    _ticker8 = request['inputTicker8']
+    portfolio_size = request['portfolioSize']
+
+    # Transorm tickers to appropriate format (Sort + Capitalize)
+    tickers = [_ticker1,_ticker2, _ticker3, _ticker4, _ticker5
+               , _ticker6, _ticker7, _ticker8]
+    tickers = filter_tickers( tickers, portfolio_size ) # Filter out empty inputs
+
+    return tickers
+
+
+
+
+def recreate_portfolio(request):
+
+    Return = float(request['Return'])
+    Risk = request['Risk']
+    weights = request['weights']
+    tickers = request['tickers']
+    algorithm = request['algorithm']
+    cash = request['cash']
+    cash_str = "{:,.2f}".format(float(cash))
+    share_volume_list = request['share_volume_list']
+    sectors = request['sectors']
+    cash = request['cash']
+    cash_str = "{:,.2f}".format(float(cash))
+
+    # Format these variables back into the appropriate format
+    weights = process_weights( weights )
+    tickers = ast.literal_eval(tickers)
+    sectors = ast.literal_eval(sectors)
+    algorithm = calculate_ratio(algorithm)
+    share_volume_list = ast.literal_eval(share_volume_list)
+
+    # Recreate the Portfolio object
+    portfolio = Portfolio(cash=float(cash), algorithm=algorithm, mar_value=0, user_expected_return="")
+    portfolio.exp_return = Return
+    portfolio.risk = Risk
+    portfolio.cash_str = cash_str
+
+    # Recreate the asset objects
+    assets = createAssets(tickers, sectors, portfolio)
+    assets = add_weights_to_assets(assets, weights)
+    assets = add_share_volume_to_assets(assets, share_volume_list)
+    assets = add_names_to_assets( assets )
+
+    # Link portfolio back to assets
+    portfolio.assets = assets
+
+    return portfolio
+
+
 
 # Create and return a list of asset objects
 def createAssets(tickers, sector_list, portfolio):

@@ -9,7 +9,11 @@ import time
 
 from random import randint
 import portfolio_lib as pl
-from portfolio import Portfolio
+
+from portfolio_classes.portfolio import Portfolio
+from portfolio_classes.asset import Asset
+
+
 
 yahoo_up = True
 
@@ -21,30 +25,30 @@ clear_bit_api_key = "sk_34b33f60cc6cb5f54ee9033cfe4bf757"
 
 
 # Specify number of iterations to create
-
 num_portfolios = 250
-#num_portfolios = 50
+
 
 
 # Method to produce the weight allocation deemed optimal by the algorithm
 
-def OptimizePortfolio(FindBestRatio, portfolio):
+def OptimizePortfolio( portfolio ):
 
     assets = portfolio.assets
-    ticker_list = []
 
-    for asset in assets:
-        ticker_list.append(asset.ticker)
+    # Extract a list of the ticker names to pass to pandas datareader
+    ticker_list = list(a.ticker for a in assets)
 
+    # Has yahoo API been taken down?
     if yahoo_up:
-
         try:
-            """ Read adj close data from api for each stock into a dataframe """
+            #Read adj close data from api for each stock into a dataframe
             data = web.DataReader( ticker_list, data_source="yahoo", start=global_start_date, end=global_end_date)['Adj Close']
             data.sort_index(inplace=True)
         except:
-            return False, "Something went wrong", None
+            # Server side API problem -> Bail out and tell user somethig went wrong
+            return False, "Something went wrong :("
     else:
+        # If API goes down, use csv file
         data = pd.read_csv('stocks.csv')
         data.sort_index(inplace=True)
         data = data.drop(columns=['Date'])
@@ -53,7 +57,8 @@ def OptimizePortfolio(FindBestRatio, portfolio):
     # Validate user provided tickers
     for asset in assets:
         if data[asset.ticker].isnull().all():
-            return False, ticker, None
+            message = "Invalid Ticker Entered: %s" % asset.ticker
+            return False, message
 
     # Calculate the sharpe ratio for each stock in the portfolio and put it into a list
     # This list will be used to plot points on the efficient frontier graph
@@ -77,15 +82,15 @@ def OptimizePortfolio(FindBestRatio, portfolio):
     cov_matrix = returns.cov()
 
     results = np.zeros((3, num_portfolios))
+
+
     currentSharpe = -4000
-    currentWorstSharpe = 4000
+
     lowest_current_risk = 4000
     BestReturn = 0
 
 
     print("Starting optimization...")
-
-
     for i in range(num_portfolios):
 
         #select random weights for portfolio assets
@@ -103,47 +108,37 @@ def OptimizePortfolio(FindBestRatio, portfolio):
         results[0,i] = portfolio_return
         results[1,i] = portfolio_std_dev
 
-
         # Store Sharpe/Sortino Ratio  ( return / volatility )
         results[2,i] = results[0,i] / results[1,i]
 
         # Find the portfolio with the best sharpe ratio
-        if FindBestRatio:
+        if portfolio.BestRatio:
             if results[2,i] > currentSharpe:
                 currentSharpe = results[2,i]
                 BestWeights = round_list(weights)
                 BestReturn = portfolio_return
                 currentRisk = round(results[1,i],2)
-
-            if results[2,i] < currentWorstSharpe:
-
-                currentWorstSharpe = results[2,i]
-                WorstWeights = round_list(weights)
-                WorstReturn = portfolio_return
-
         else:
-            ## Find the portfolio with the expected return that is greater than or equal to the specified return
-                ## but also has the lowest risk
-            if( portfolio_return > float(portfolio.user_expected_return) and
-                portfolio_std_dev < lowest_current_risk ):
-
-
+            # Find the portfolio with the expected return that is greater than or equal to the specified return
+            # but also has the lowest risk
+            if portfolio_return > float(portfolio.user_expected_return) and portfolio_std_dev < lowest_current_risk:
                 BestWeights = round_list(weights)
                 BestReturn = portfolio_return
                 currentRisk = round(results[1,i],2)
 
+    # Add the newly found weights to the asset objects
+    assets = pl.add_weights_to_assets(assets, BestWeights)
+
+    # Add the exp return and risk to portfolio object
+    portfolio.exp_return = BestReturn
+    portfolio.risk = currentRisk
 
 
     labels = []
 
     # Get a list of the stocks to be used as labels for the pie charts
     for asset in assets:
-        labels.append( asset.ticker )
-
-
-    assets = pl.add_weights_to_assets(assets, BestWeights)
-    portfolio.exp_return = BestReturn
-    portfolio.risk = currentRisk
+            labels.append( asset.ticker )
 
     # Plot Graphs
     plot_efficient_chart( results, portfolio, stock_sharpe_list)
@@ -152,18 +147,15 @@ def OptimizePortfolio(FindBestRatio, portfolio):
 
     plot_line_chart( ticker_list, BestWeights, float(portfolio.cash) )
 
-    return BestReturn, BestWeights, currentRisk
+    return True, ""
 
 
 
 """
-
 Use the stocks, weights, cash value and the current share value to calculate how
 many shares of each stock can be bought.
 
-
 User inputs cash in pounds but stock value is in USD. Need to convert currency
-
 """
 from currency_converter import CurrencyConverter
 
@@ -174,18 +166,21 @@ def CalculateShareVolume( portfolio ):
     assets = portfolio.assets
     share_volume_list = []
 
+    # For each asset, convert GBP to USD, calculate current share price and divide to find number shares
     for a in assets:
-
         stock_cash_value_pounds = float(a.weight) * float(cash)
-
         c = CurrencyConverter()
-
         stock_cash_value_dollars = c.convert (stock_cash_value_pounds, 'GBP', 'USD')
+        share_price = calculate_share_price( a.ticker )
 
-        share_volume = round( stock_cash_value_dollars / share_price( a.ticker ), 2)
-        a.share_volume = share_volume
+        # If share price is valid, add it to asset object
+        if share_price:
+            a.share_volume = round( stock_cash_value_dollars / share_price, 2)
+        else:
+            # API call to get share price failed, return n/a instead
+            a.share_volume = "N/A"
 
-        share_volume_list.append( share_volume )
+        share_volume_list.append( a.share_volume )
 
     return share_volume_list
 
@@ -194,7 +189,6 @@ class StockSharpe:
     risk = 0
     exp_return = 0
     ticker = ""
-
 
 
 # Find the sharpe ratio for each stock in the tickers list
@@ -241,7 +235,7 @@ Had lots of issued with dates because the stock market closes on weekends, holid
 doesnt open in the UK until late afternoon
 """
 
-def share_price( ticker ):
+def calculate_share_price( ticker ):
 
     one = dt.datetime.now()
 
@@ -265,22 +259,24 @@ def share_price( ticker ):
         one = one - timedelta(days=2)
 
 
-    # Format date for the datareader
-    date_formated = one.strftime("%m/%d/%Y")
 
 
-    stocks = [ticker]
+    stock_value = 0
 
     # Read the Adj Close for the 1 stock on a single day
-    data = web.DataReader( stocks, data_source="yahoo", start=date_formated, end=date_formated)['Adj Close']
+    try:
+        # Format date for the datareader
+        date_formated = one.strftime("%m/%d/%Y")
+        data = web.DataReader( [ticker], data_source="yahoo", start=date_formated, end=date_formated)['Adj Close']
+        data.sort_index(inplace=True)
 
-    data.sort_index(inplace=True)
+        # Obtain the adj close
+        stock_value = data[ticker].iloc[0]
+    except:
+        # API Call failed for some reason
+        stock_value = False
 
-    # Obtain the adj close
-    value = data[ticker].iloc[0]
-
-
-    return value
+    return stock_value
 
 
 def plot_efficient_chart( results, portfolio, stock_sharpe_list):
