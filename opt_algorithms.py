@@ -364,7 +364,7 @@ def plot_line_chart(tickers, weights, cash):
 
     # The data for NYA stock would change between API calls? Some days were missing and different etc...
     # Best solution for this was to read the correct values from an index fund
-    index_data = pd.read_csv("C:\\Users\\marc.smith\\AppData\\Local\\Programs\\Python\\Python37-32\\index.csv")
+    index_data = pd.read_csv("index.csv")
 
 
     # Portfolio df
@@ -481,7 +481,7 @@ def round_list(param_list):
 
 def find_stock_names( tickers ):
 
-    data = pd.read_csv("C:\\Users\\marc.smith\\AppData\\Local\\Programs\\Python\\Python37-32\\static\\symbols\\filtered_stocks.csv")
+    data = pd.read_csv("..\\static\\symbols\\filtered_stocks.csv")
 
     stock_name_list = []
 
@@ -496,7 +496,7 @@ def find_stock_names( tickers ):
 
 def find_sectors( symbols ):
 
-    data = pd.read_csv("C:\\Users\\marc.smith\\AppData\\Local\\Programs\\Python\\Python37-32\\static\\symbols\\filtered_stocks.csv")
+    data = pd.read_csv("..\\static\\symbols\\filtered_stocks.csv")
 
     sector_list = []
     stock_name_list = []
@@ -683,7 +683,7 @@ def add_stocks( num_stocks, tickers, sectors ):
 
 def find_stock_in_sector( sector ):
 
-    data = pd.read_csv("C:\\Users\\marc.smith\\AppData\\Local\\Programs\\Python\\Python37-32\\static\\symbols\\filtered_stocks.csv")
+    data = pd.read_csv("..\\static\\symbols\\filtered_stocks.csv")
 
 
 
