@@ -541,7 +541,7 @@ def calculate_ratio( algorithm ):
 
 def add_names_to_assets(assets):
 
-    data = pd.read_csv("C:\\Users\\marc.smith\\AppData\\Local\\Programs\\Python\\Python37-32\\static\\symbols\\filtered_stocks.csv")
+    data = pd.read_csv("..\\static\\symbols\\filtered_stocks.csv")
 
     for a in assets:
         # Find the stocks names from the symbols AAPL -> Apple Inc
