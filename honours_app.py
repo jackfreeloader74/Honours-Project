@@ -169,10 +169,10 @@ def generatePDF():
                                Sharpe=Sharpe,
                                cash=cash,
                                future_cash=future_cash,
-                               url_pie='C:/Users/marc.smith/AppData/Local/Programs/Python/Python37-32/static/images/pie_chart.png',
-                               sector_pie='C:/Users/marc.smith/AppData/Local/Programs/Python/Python37-32/static/images/sector_makeup.png',
-                               url_efficient='C:/Users/marc.smith/AppData/Local/Programs/Python/Python37-32/static/images/efficient_frontier.png',
-                               url_performance='C:/Users/marc.smith/AppData/Local/Programs/Python/Python37-32/static/images/portfolio_value_chart.png',
+                               url_pie='../static/images/pie_chart.png',
+                               sector_pie='../static/images/sector_makeup.png',
+                               url_efficient=../static/images/efficient_frontier.png',
+                               url_performance='../static/images/portfolio_value_chart.png',
                                table=table,
                                dividends=dividend_details)
 
